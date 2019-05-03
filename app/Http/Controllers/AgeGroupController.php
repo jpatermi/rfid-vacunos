@@ -14,7 +14,7 @@ class AgeGroupController extends Controller
      */
     public function index()
     {
-        $ageGroups = AgeGroup::all()->sortBy('name')->values();
+        $ageGroups = AgeGroup::all()->sortBy('id')->values();
         return response()->json($ageGroups, 200);
     }
 
@@ -126,5 +126,25 @@ class AgeGroupController extends Controller
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => 'Sin contenido'], 406);
         }
+    }
+    /**
+     * Display a Total of the resource by Breeds.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function totalAnimalsAgeGroups()
+    {
+        /*** Con este me traigo el total de Animales por Razas ****/
+        $ageGroups = \App\AgeGroup::withCount('animals')->get()->where("animals_count", ">", 0);
+        $totalAgeGroup = array();
+        foreach ($ageGroups as $ageGroup) {
+            $name   = $ageGroup->name;
+            for ($x = 1; $x <= (25 - strlen($ageGroup->name)); $x++)
+            {
+                $name = $name . "\t";
+            }
+            $totalAgeGroup[] = $name . $ageGroup->animals_count;
+        }
+        return response()->json(['totals' => $totalAgeGroup], 200);
     }
 }

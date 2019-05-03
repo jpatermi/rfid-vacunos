@@ -21,6 +21,8 @@ class Animal extends Model
         'breed_id',
         'mother_rfid',
         'father_rfid',
+        'last_weight',
+        'last_height',
         'age_group_id',
         'farm_id',
         'area_id',
@@ -108,7 +110,30 @@ class Animal extends Model
     */
     public function vaccinations()
     {
-        return $this->belongsToMany('App\Vaccination')->using('App\AnimalVaccination')->withPivot('application_date', 'id')->wherePivot('deleted_at', null);
+        return $this->belongsToMany('App\Vaccination')
+                    ->using('App\AnimalVaccination')
+                    ->withPivot('application_date', 'id', 'dose')
+                    ->wherePivot('deleted_at', null);
+    }
+    /**
+     * Get the comments for the dewormers.
+    */
+    public function dewormers()
+    {
+        return $this->belongsToMany('App\Dewormer')
+                    ->using('App\AnimalDewormer')
+                    ->withPivot('application_date', 'id', 'dose')
+                    ->wherePivot('deleted_at', null);
+    }
+    /**
+     * Get the comments for the vitamin.
+    */
+    public function vitamins()
+    {
+        return $this->belongsToMany('App\Vitamin')
+                    ->using('App\AnimalVitamin')
+                    ->withPivot('application_date', 'id', 'dose')
+                    ->wherePivot('deleted_at', null);
     }
     /**
      * Get the comments for the age group.
@@ -123,5 +148,26 @@ class Animal extends Model
     public function animalLocations()
     {
         return $this->hasMany('App\AnimalLocation');
+    }
+    /**
+     * Get the comments for the diseases.
+    */
+    public function diseases()
+    {
+        return $this->hasMany('App\Disease');
+    }
+    /**
+     * Get the comments for the animals.
+    */
+    public function animalHistoricals()
+    {
+        return $this->hasMany('App\HistoricalWeightHeight');
+    }
+    /**
+     * Get the comments for the animals.
+    */
+    public function productions()
+    {
+        return $this->hasMany('App\Production');
     }
 }

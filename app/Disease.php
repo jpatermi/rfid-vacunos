@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class AnimalLocation extends Model
+class Disease extends Model
 {
     use SoftDeletes;
     /**
@@ -15,10 +15,11 @@ class AnimalLocation extends Model
      */
     protected $fillable = [
     	'animal_id',
-    	'farm_id',
-        'area_id',
-        'lct1_id',
-        'lct2_id',
+    	'veterinarian_id',
+        'diagnostic_id',
+        'cause_id',
+        'responsible_id',
+        'review_date',
     ];
 
     /**
@@ -38,7 +39,8 @@ class AnimalLocation extends Model
      * @var array
      */
     protected $dates = [
-    	'created_at',
+    	'review_date',
+    	'deleted_at',
     ];
     /**
      * Get the comments for the farm.
@@ -50,29 +52,39 @@ class AnimalLocation extends Model
     /**
      * Get the comments for the farm.
     */
-    public function farm()
+    public function veterinarian()
     {
-        return $this->belongsTo('App\Farm');
+        return $this->belongsTo('App\Veterinarian');
     }
     /**
      * Get the comments for the area.
     */
-    public function area()
+    public function diagnostic()
     {
-        return $this->belongsTo('App\Area');
+        return $this->belongsTo('App\Diagnostic');
     }
     /**
      * Get the comments for the lct1.
     */
-    public function lct1()
+    public function cause()
     {
-        return $this->belongsTo('App\Lct1');
+        return $this->belongsTo('App\Cause');
     }
     /**
      * Get the comments for the lct2.
     */
-    public function lct2()
+    public function responsible()
     {
-        return $this->belongsTo('App\Lct2');
+        return $this->belongsTo('App\Responsible');
+    }
+    /**
+     * Get the comments for the treatments.
+    */
+    public function treatments()
+    {
+        return $this->belongsToMany('App\Treatment')
+                    ->using('App\DiseaseTreatment')
+                    ->withPivot('indication', 'id')
+                    ->wherePivot('deleted_at', null);
     }
 }

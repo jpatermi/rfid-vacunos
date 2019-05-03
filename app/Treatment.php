@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Vaccination extends Model
+class Treatment extends Model
 {
     use SoftDeletes;
     /**
@@ -15,7 +15,6 @@ class Vaccination extends Model
      */
     protected $fillable = [
         'name',
-        'characteristic',
     ];
 
     /**
@@ -28,21 +27,14 @@ class Vaccination extends Model
         'created_at',
         'updated_at',
     ];
-
-     /**
-     * The attributes that should be mutated to dates.
-     *
-     * @var array
-     */
-    protected $dates = ['deleted_at'];
     /**
-     * Get the comments for the animals.
+     * Get the comments for the diseases.
     */
-    public function AnimalVaccinations()
+    public function diseases()
     {
-        return $this->belongsToMany('App\Animal')
-                    ->using('App\AnimalVaccination')
-                    ->withPivot('application_date', 'id', 'dose')
+        return $this->belongsToMany('App\Disease')
+                    ->using('App\DiseaseTreatment')
+                    ->withPivot('id', 'indication')
                     ->wherePivot('deleted_at', null);
     }
 }

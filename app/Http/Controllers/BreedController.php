@@ -135,14 +135,14 @@ class BreedController extends Controller
      */
     public function totalAnimalsBreeds()
     {
-        /*** Con este me traigo el total de Animales por áreas ****/
+        /*** Con este me traigo el total de Animales por Razas ****/
         $breeds = \App\Breed::withCount('animals')->get()->where("animals_count", ">", 0);
         $totalBreeds = array();
         foreach ($breeds as $breed) {
             $name   = $breed->name;
-            for ($x = 1; $x <= (65 - strlen($breed->name)); $x++)
+            for ($x = 1; $x <= (26 - strlen($breed->name)); $x++)
             {
-                $name = $name . ' ';
+                $name = $name . "\t";
             }
             $totalBreeds[] = $name . $breed->animals_count;
         }

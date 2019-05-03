@@ -2,11 +2,10 @@
 
 namespace App;
 
-/*use Illuminate\Database\Eloquent\Model;*/
-use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class AnimalVaccination extends Pivot
+class Vitamin extends Model
 {
     use SoftDeletes;
     /**
@@ -15,10 +14,8 @@ class AnimalVaccination extends Pivot
      * @var array
      */
     protected $fillable = [
-    	'animal_id',
-    	'vaccination_id',
-        'dose',
-        'application_date',
+        'name',
+        'characteristic',
     ];
 
     /**
@@ -37,7 +34,15 @@ class AnimalVaccination extends Pivot
      *
      * @var array
      */
-    protected $dates = ['deleted_at', 'application_date'];
-
-    //protected $dateFormat = 'd-m-Y H:i:s'; /* funciona pero para insertar un modelo da error en la BD */
+    protected $dates = ['deleted_at'];
+    /**
+     * Get the comments for the animals.
+    */
+    public function AnimalVitamins()
+    {
+        return $this->belongsToMany('App\Animal')
+                    ->using('App\AnimalVitamin')
+                    ->withPivot('application_date', 'id', 'dose')
+                    ->wherePivot('deleted_at', null);
+    }
 }

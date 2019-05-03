@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Area;
+use App\Treatment;
 use Illuminate\Http\Request;
-use App\Animal;
-use App\Lct1;
 
-class AreaController extends Controller
+class TreatmentController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,8 +14,8 @@ class AreaController extends Controller
      */
     public function index()
     {
-        $areas= Area::all()->sortBy('name')->values();
-        return response()->json($areas, 200);
+        $treatments = Treatment::all()->sortBy('name')->values();
+        return response()->json($treatments, 200);
     }
 
     /**
@@ -40,11 +38,10 @@ class AreaController extends Controller
     {
         try {
             $data = $request->json()->all();
-            $area = Area::create([
-              'name' => $data['name'],
-              'farm_id' => $data['farm_id']
+            $treatment = Treatment::create([
+              'name' => $data['name']
             ]);
-            return response()->json($area, 201);
+            return response()->json($treatment, 201);
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
         }
@@ -53,26 +50,26 @@ class AreaController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Area  $area
+     * @param  \App\Treatment  $treatment
      * @return \Illuminate\Http\Response
      */
-    public function show($area)
+    public function show($treatment)
     {
-        $area = Area::find($area);
-        if($area) {
-            return response()->json($area, 200);
+        $treatment = Treatment::find($treatment);
+        if($treatment) {
+            return response()->json($treatment, 200);
         } else {
-            return response()->json(['error' => 'Área no existente'], 406);
+            return response()->json(['error' => 'Tratamiento no existente'], 406);
         }
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Area  $area
+     * @param  \App\Treatment  $treatment
      * @return \Illuminate\Http\Response
      */
-    public function edit(Area $area)
+    public function edit(Treatment $treatment)
     {
         //
     }
@@ -81,22 +78,20 @@ class AreaController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Area  $area
+     * @param  \App\Treatment  $treatment
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $area)
+    public function update(Request $request, $treatment)
     {
         try {
-
             $data = $request->json()->all();
-            $area = Area::find($area);
-            if($area) {
-                $area->name = $data['name'];
-                $area->farm_id = $data['farm_id'];
-                $area->save();
-                return response()->json($area, 201);
+            $treatment = Treatment::find($treatment);
+            if($treatment) {
+                $treatment->name = $data['name'];
+                $treatment->save();
+                return response()->json($treatment, 201);
             } else {
-                return response()->json(['error' => 'Área no existente'], 406);
+                return response()->json(['error' => 'Tratamiento no existente'], 406);
             }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => 'Sin contenido'], 406);
@@ -106,35 +101,27 @@ class AreaController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Area  $area
+     * @param  \App\Treatment  $treatment
      * @return \Illuminate\Http\Response
      */
-    public function destroy($area)
+    public function destroy($treatment)
     {
         try {
-            $areaLocated = Area::find($area);
-            if($areaLocated) {
-                $animals = Animal::where('area_id', $area)->get();
-                $lct1s = Lct1::where('area_id', $area)->get();
-                if ($animals->isNotEmpty()) {
+            $treatmentLocated = Treatment::find($treatment);
+            if($treatmentLocated) {
+                $medicalDiagnostics = MedicalDiagnostic::where('treatment_id', $treatment)->get();
+                if ($medicalDiagnostics->isNotEmpty()) {
                     $animalRFID = array();
-                    foreach ($animals as $animal) {
-                        $animalRFID[] = $animal->animal_rfid;
+                    foreach ($medicalDiagnostics as $medicalDiagnostic) {
+                        $animalRFID[] = $medicalDiagnostic->id;
                     }
                     return response()->json(['conflicto' => $animalRFID], 409);
-                }
-                elseif ($lct1s->isNotEmpty()) {
-                    $lct1Name = array();
-                    foreach ($lct1s as $lct1) {
-                        $lct1Name[] = $lct1->name;
-                    }
-                    return response()->json(['conflicto' => $lct1Name], 409);
                 } else {
-                    $areaLocated->delete();
-                    return response()->json(['exitoso' => 'Area: ' . $areaLocated->name . ' eliminada con éxito'], 204);
+                    $treatmentLocated->delete();
+                    return response()->json(['exitoso' => 'Tratamiento: ' . $treatmentLocated->name . ' eliminado con éxito'], 204);
                 }
             } else {
-                return response()->json(['error' => 'Area no existente'], 406);
+                return response()->json(['error' => 'Tratamiento no existente'], 406);
             }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => 'Sin contenido'], 406);

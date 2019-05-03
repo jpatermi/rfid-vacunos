@@ -49,11 +49,12 @@ class AnimalVaccinationController extends Controller
                     $anivac = AnimalVaccination::create([
                       'animal_id' => $data['animal_id'],
                       'vaccination_id' => $data['vaccination_id'],
-                      'application_date' => $data['application_date']
+                      'dose' => $data['dose'],
+                      'application_date' => $data['application_date'],
                     ]);
                     return response()->json($anivac, 201);
                 } else {
-                    return response()->json(['error' => 'El Animal: ' . $animal->animal_rfid . ' ya tiene la vacuna: ' . $anivac->name . ' de fecha: ' . $data['application_date']], 406);
+                    return response()->json(['error' => 'El Animal: ' . $animal->animal_rfid . ' ya tiene la vacuna: ' . $anivac->name . ' de fecha: ' . $anivac->pivot->application_date->format('d/m/Y')], 406);
                 }
             } else {
                 return response()->json(['error' => 'Animal no existente'], 406);
@@ -70,7 +71,7 @@ class AnimalVaccinationController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($animal_id)
+    public function showUnSoloListView($animal_id)
     {
         $animal = Animal::find($animal_id);
         if($animal) {
@@ -82,7 +83,12 @@ class AnimalVaccinationController extends Controller
                 $applications = array();
                 foreach ($vaccinations as $vaccination) {
                     $name = $vaccination->name;
-                    for ($x = 1; $x <= (45 - strlen($vaccination->name)); $x++) {
+                    for ($x = 1; $x <= (25 - strlen($vaccination->name)); $x++) {
+                        $name = $name . ' ';
+                    }
+                    $name = $name . $vaccination->pivot->dose;
+                    $name2 = $name;
+                    for ($x = 1; $x <= (38 - strlen($name2)); $x++) {
                         $name = $name . ' ';
                     }
                     $application = array('id_vaccination' => $vaccination->id,
@@ -96,6 +102,46 @@ class AnimalVaccinationController extends Controller
                 return response()->json(['error' => 'el Animal ' . $animal->animal_rfid . ' no ha sido vacunado aún'], 406);
             }
         } else {
+            return response()->json(['error' => 'Animal no existente'], 406);
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $animal_id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($animal_id)
+    {
+        $animal = Animal::find($animal_id);
+        if($animal)
+        {
+            $vaccinations = $animal->vaccinations()
+                                   ->orderBy('application_date', 'desc')
+                                   ->orderBy('name', 'asc')
+                                   ->get();
+            if($vaccinations->isNotEmpty())
+            {
+                $applications = array();
+                foreach ($vaccinations as $vaccination)
+                {
+                    $application = array('id_vac_desp_vit' => $vaccination->id,
+                                         'name_vac_desp_vit' => $vaccination->name,
+                                         'dose' => $vaccination->pivot->dose,
+                                         'application_date' => $vaccination->pivot->application_date->format('d/m/Y'),
+                                         'id_ani_vac_desp_vit' => $vaccination->pivot->id);
+                    $applications[] = $application;
+                }
+                return response()->json($applications, 200);
+            }
+            else
+            {
+                return response()->json(['error' => 'el Animal ' . $animal->animal_rfid . ' no ha sido vacunado aún'], 406);
+            }
+        }
+        else
+        {
             return response()->json(['error' => 'Animal no existente'], 406);
         }
     }
@@ -126,6 +172,7 @@ class AnimalVaccinationController extends Controller
             if($anivac) {
                 $anivac->animal_id = $data['animal_id'];
                 $anivac->vaccination_id = $data['vaccination_id'];
+                $anivac->dose = $data['dose'];
                 $anivac->application_date = $data['application_date'];
                 $anivac->save();
                 return response()->json($anivac, 201);
@@ -146,9 +193,9 @@ class AnimalVaccinationController extends Controller
     public function destroy($id)
     {
         try {
-            $anivacLocated = AnimalVaccination::find($id);
-            if($anivacLocated) {
-                $anivacLocated->delete();
+            $anivac = AnimalVaccination::find($id);
+            if($anivac) {
+                $anivac->delete();
                 return response()->json(['exitoso' => 'Aplicación eliminada con éxito'], 204);
             } else {
                 return response()->json(['error' => 'Aplicación de Vacuna no existente'], 406);

@@ -38,9 +38,22 @@ Route::group(['middleware' => ['auth', 'isJson']], function() use($router) {
 	Route::resource('breeds', 'BreedController');
 	Route::resource('animals', 'AnimalController');
 	Route::resource('vaccinations', 'VaccinationController');
+	Route::resource('dewormers', 'DewormerController');
+	Route::resource('vitamins', 'VitaminController');
 	Route::resource('animalvaccination', 'AnimalVaccinationController');
+	Route::resource('animaldewormer', 'AnimalDewormerController');
+	Route::resource('animalvitamin', 'AnimalVitaminController');
 	Route::resource('agegroups', 'AgeGroupController');
 	Route::resource('animallocations', 'AnimalLocationController');
+	Route::resource('veterinarians', 'VeterinarianController');
+	Route::resource('diagnostics', 'DiagnosticController');
+	Route::resource('causes', 'CauseController');
+	Route::resource('treatments', 'TreatmentController');
+	Route::resource('responsibles', 'ResponsibleController');
+	Route::resource('diseases', 'DiseaseController');
+	Route::get('/animaldiseases/{animal_rfid}', ['uses'=>'DiseaseController@getAnimalDiseases']);
+	Route::resource('historicals', 'HistoricalWeightHeightController');
+	Route::resource('productions', 'ProductionController');
 
 	/*** Inventory ***/
 	Route::get('/totalanimals', ['uses'=>'AnimalController@totalAnimals']);
@@ -56,4 +69,9 @@ Route::group(['middleware' => ['auth', 'isJson']], function() use($router) {
 
 	/*** Display the locations 1 belonging to the specific locations 2. ***/
 	Route::get('/showbylct1/{lct1_id}', ['uses'=>'Lct2Controller@showByLct1']);
+
+	Route::get('/totalanimalvaccinations', ['uses'=>'VaccinationController@totalAnimalVaccinations']);
+	Route::get('/totalanimaldewormers', ['uses'=>'DewormerController@totalAnimalDewormers']);
+	Route::get('/totalanimalvitamins', ['uses'=>'VitaminController@totalAnimalVitamins']);
+	Route::get('/totalanimalagegroups', ['uses'=>'AgeGroupController@totalAnimalsAgeGroups']);
 });

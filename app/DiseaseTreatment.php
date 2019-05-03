@@ -2,11 +2,10 @@
 
 namespace App;
 
-/*use Illuminate\Database\Eloquent\Model;*/
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class AnimalVaccination extends Pivot
+class DiseaseTreatment extends Pivot
 {
     use SoftDeletes;
     /**
@@ -15,10 +14,9 @@ class AnimalVaccination extends Pivot
      * @var array
      */
     protected $fillable = [
-    	'animal_id',
-    	'vaccination_id',
-        'dose',
-        'application_date',
+    	'disease_id',
+    	'treatment_id',
+        'indication',
     ];
 
     /**
@@ -37,7 +35,6 @@ class AnimalVaccination extends Pivot
      *
      * @var array
      */
-    protected $dates = ['deleted_at', 'application_date'];
-
-    //protected $dateFormat = 'd-m-Y H:i:s'; /* funciona pero para insertar un modelo da error en la BD */
+    protected $dates = ['deleted_at',];
+    //protected $table = ['disease_treatmen',];
 }

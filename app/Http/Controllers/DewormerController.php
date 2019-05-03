@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Vaccination;
+use App\Dewormer;
 use Illuminate\Http\Request;
 
-class VaccinationController extends Controller
+class DewormerController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,8 +14,8 @@ class VaccinationController extends Controller
      */
     public function index()
     {
-        $vaccination = Vaccination::all()->sortBy('name')->values();
-        return response()->json($vaccination, 200);
+        $dewormer = Dewormer::all()->sortBy('name')->values();
+        return response()->json($dewormer, 200);
     }
 
     /**
@@ -38,11 +38,11 @@ class VaccinationController extends Controller
     {
         try {
             $data = $request->json()->all();
-            $vaccination = Vaccination::create([
+            $dewormer = Dewormer::create([
               'name' => $data['name'],
               'characteristic' => $data['characteristic'],
             ]);
-            return response()->json($vaccination, 201);
+            return response()->json($dewormer, 201);
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
         }
@@ -51,26 +51,26 @@ class VaccinationController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Vaccination  $vaccination
+     * @param  \App\Dewormer  $dewormer
      * @return \Illuminate\Http\Response
      */
-    public function show($vaccination)
+    public function show($dewormer)
     {
-        $vaccination = Vaccination::find($vaccination);
-        if($vaccination) {
-            return response()->json($vaccination, 200);
+        $dewormer = Dewormer::find($dewormer);
+        if($dewormer) {
+            return response()->json($dewormer, 200);
         } else {
-            return response()->json(['error' => 'Vacuna no existente'], 406);
+            return response()->json(['error' => 'Desparasitante no existente'], 406);
         }
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Vaccination  $vaccination
+     * @param  \App\Dewormer  $dewormer
      * @return \Illuminate\Http\Response
      */
-    public function edit(Vaccination $vaccination)
+    public function edit(Dewormer $dewormer)
     {
         //
     }
@@ -79,21 +79,21 @@ class VaccinationController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Vaccination  $vaccination
+     * @param  \App\Dewormer  $dewormer
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $vaccination)
+    public function update(Request $request, $dewormer)
     {
         try {
             $data = $request->json()->all();
-            $vaccination = Vaccination::find($vaccination);
-            if($vaccination) {
-                $vaccination->name = $data['name'];
-                $vaccination->characteristic = $data['characteristic'];
-                $vaccination->save();
-                return response()->json($vaccination, 201);
+            $dewormer = Dewormer::find($dewormer);
+            if($dewormer) {
+                $dewormer->name = $data['name'];
+                $dewormer->characteristic = $data['characteristic'];
+                $dewormer->save();
+                return response()->json($dewormer, 201);
             } else {
-                return response()->json(['error' => 'Vacuna no existente'], 406);
+                return response()->json(['error' => 'Desparasitante no existente'], 406);
             }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => 'Sin contenido'], 406);
@@ -103,15 +103,15 @@ class VaccinationController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Vaccination  $vaccination
+     * @param  \App\Dewormer  $dewormer
      * @return \Illuminate\Http\Response
      */
-    public function destroy($vaccination)
+    public function destroy($dewormer)
     {
         try {
-            $vaccination = Vaccination::find($vaccination);
-            if($vaccination) {
-                $animalVaccinations = $vaccination->animalVaccinations;
+            $dewormer = Dewormer::find($dewormer);
+            if($dewormer) {
+                $animals = $dewormer->animalDewormers;
                 if ($animals->isNotEmpty()) {
                     $animalRFID = array();
                     foreach ($animals as $animal) {
@@ -119,36 +119,36 @@ class VaccinationController extends Controller
                     }
                     return response()->json(['conflicto' => $animalRFID], 409);
                 } else {
-                    $vaccination->delete();
-                    return response()->json(['exitoso' => 'Vacuna: ' . $vaccination->name . ' eliminada con éxito'], 204);
+                    $dewormer->delete();
+                    return response()->json(['exitoso' => 'Desparasitante: ' . $dewormer->name . ' eliminada con éxito'], 204);
                 }
             } else {
-                return response()->json(['error' => 'Vacuna no existente'], 406);
+                return response()->json(['error' => 'Desparasitante no existente'], 406);
             }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => 'Sin contenido'], 406);
         }
     }
     /**
-     * Display a Total of the resource by Vaccinations.
+     * Display a Total of the resource by Dewormer.
      *
      * @return \Illuminate\Http\Response
      */
-    public function totalAnimalVaccinations()
+    public function totalAnimalDewormers()
     {
         /*** Con este me traigo el total de Animales por Razas ****/
-        $vaccinations = \App\Vaccination::all();
-        $totalVaccinations = array();
-        foreach ($vaccinations as $vaccination)
+        $dewormers = \App\Dewormer::all();
+        $totalDewormers = array();
+        foreach ($dewormers as $dewormer)
         {
-            $name   = $vaccination->name;
-            $totalVaccinations[] = $name;
-            $animals = $vaccination->AnimalVaccinations;
+            $name   = $dewormer->name;
+            $totalDewormers[] = $name;
+            $animals = $dewormer->animalDewormers;
             foreach ($animals as $animal)
             {
-                $totalVaccinations[] = "\t\t" . $animal->animal_rfid . "\t\t\t\t\t\t\t\t" . $animal->pivot->application_date->format('d/m/Y');
+                $totalDewormers[] = "\t\t" . $animal->animal_rfid . "\t\t\t\t\t\t\t\t" . $animal->pivot->application_date->format('d/m/Y');
             }
         }
-        return response()->json(['totals' => $totalVaccinations], 200);
+        return response()->json(['totals' => $totalDewormers], 200);
     }
 }

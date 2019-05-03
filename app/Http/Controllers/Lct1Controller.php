@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Lct1;
 use Illuminate\Http\Request;
+use App\Animal;
+use App\Lct2;
 
 class Lct1Controller extends Controller
 {
@@ -106,9 +108,36 @@ class Lct1Controller extends Controller
      * @param  \App\Lct1  $lct1
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Lct1 $lct1)
+    public function destroy($lct1)
     {
-        //
+        try {
+            $lct1Located = Lct1::find($lct1);
+            if($lct1Located) {
+                $animals = Animal::where('lct1_id', $lct1)->get();
+                $lct2s = Lct2::where('lct1_id', $lct1)->get();
+                if ($animals->isNotEmpty()) {
+                    $animalRFID = array();
+                    foreach ($animals as $animal) {
+                        $animalRFID[] = $animal->animal_rfid;
+                    }
+                    return response()->json(['conflicto' => $animalRFID], 409);
+                }
+                elseif ($lct2s->isNotEmpty()) {
+                    $lct2Name = array();
+                    foreach ($lct2s as $lct2) {
+                        $lct2Name[] = $lct2->name;
+                    }
+                    return response()->json(['conflicto' => $lct2Name], 409);
+                } else {
+                    $lct1Located->delete();
+                    return response()->json(['exitoso' => 'Ubicación UNO: ' . $lct1Located->name . ' eliminada con éxito'], 204);
+                }
+            } else {
+                return response()->json(['error' => 'Ubicación UNO no existente'], 406);
+            }
+        } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
+            return response()->json(['error' => 'Sin contenido'], 406);
+        }
     }
     /**
      * Display the locations 1 belonging to the specific area.
