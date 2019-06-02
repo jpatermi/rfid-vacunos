@@ -7,6 +7,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\AnimalLocation;
 use App\HistoricalWeightHeight;
+use App\PhysicalCharacteristic;
+use App\Breed;
+use App\AgeGroup;
+use App\Area;
+use App\Lct1;
+use App\Lct2;
+use Illuminate\Support\Facades\Storage;
 
 class AnimalController extends Controller
 {
@@ -18,7 +25,16 @@ class AnimalController extends Controller
     public function index()
     {
         $animals = Animal::all()->sortBy('animal_rfid')->values();
-        return response()->json($animals, 200);
+        foreach ($animals as $animal) {
+          $animal->physicalCharacteristics;
+          $animal->breed;
+        }
+        if (request()->header('Content-Type') == 'application/json') {
+            return response()->json($animals, 200);
+        } else {
+            return view('/animals/indexAnimal', compact('animals'));
+        }
+
     }
 
     /**
@@ -28,7 +44,10 @@ class AnimalController extends Controller
      */
     public function create()
     {
-        //
+        $breeds = Breed::all();
+        $ageGroups = AgeGroup::all();
+        $areas = Area::all();
+        return view('animals.createAnimal', compact('breeds', 'ageGroups', 'areas'));
     }
 
     /**
@@ -41,9 +60,27 @@ class AnimalController extends Controller
     {
         try {
             global $data, $animal;
-            $data = $request->json()->all();
+            $data = $request->validate([
+                'animal_rfid'   => 'required|unique:animals|max:10|min:10', //TODO Revisar el unique (son 2 campos)
+                'gender'        => 'required|max:1',
+                'birthdate'     => 'required|date|max:10',
+                'breed_id'      => 'required',
+                'mother_rfid'   => 'required|max:10|min:10',
+                'father_rfid'   => 'required|max:10|min:10',
+                'last_weight'   => 'required',
+                'last_height'   => 'required',
+                'age_group_id'  => 'required',
+                'farm_id'       => 'required',
+                'area_id'       => 'required',
+                'lct1_id'       => 'required',
+                'lct2_id'       => 'required',
+                'user_id'       => 'required',
+            ]);
+
+            //$data = $request->json()->all();
             $animal = Animal::where('animal_rfid', $data['animal_rfid'])->get();
-            if ($animal->isEmpty()) {
+            if ($animal->isEmpty())
+            {
                 DB::transaction(function ()
                 {
                     global $data, $animal;
@@ -77,9 +114,23 @@ class AnimalController extends Controller
                           'height' => $animal->last_height,
                           'measurement_date' => date('Y-m-d')
                         ]);
+                        // $dataPhysicalCharacteristics = $data['physical_characteristics'];
+                        // foreach ($dataPhysicalCharacteristics as $dataPhysicalCharacteristic) {
+                        //     PhysicalCharacteristic::create([
+                        //       'animal_id' => $animal->id,
+                        //       'characteristic' => $dataPhysicalCharacteristic['characteristic'],
+                        //     ]);
+                        // }
+                        // $animal->physicalCharacteristics;
                 });
-            return response()->json($animal, 201);
-            } else {
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json($animal, 201);
+                } else {
+                    return redirect()->route('animals.index');
+                }
+            }
+            else
+            {
                 return response()->json(['error' => 'Animal ' . $data['animal_rfid'] . ' ya existente'], 406);
             }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
@@ -97,6 +148,7 @@ class AnimalController extends Controller
     {
         $animal = Animal::where('animal_rfid', $animal_rfid)->get()->first();
         if ($animal) {
+            $animal->physicalCharacteristics;
             return response()->json($animal, 200);
         } else {
             return response()->json(['error' => 'Animal ' . $animal_rfid . ' no existente'], 406);
@@ -111,7 +163,16 @@ class AnimalController extends Controller
      */
     public function edit(Animal $animal)
     {
-        //
+        $breeds     = Breed::all();
+        $ageGroups  = AgeGroup::all();
+        $areas      = Area::all();
+        $lct1s      = Lct1::where('area_id', $animal->area_id)->get()->sortBy('name')->values();
+        $lct2s      = Lct2::where('lct1_id', $animal->lct1_id)->get()->sortBy('name')->values();
+        $physicalCharacteristics = $animal->physicalCharacteristics()
+                                          ->orderBy('id')
+                                          ->get();
+        $i=0;
+        return view('animals.editAnimal', compact('animal', 'ageGroups', 'areas', 'breeds', 'lct1s', 'lct2s', 'physicalCharacteristics', 'i'));
     }
 
     /**
@@ -121,17 +182,35 @@ class AnimalController extends Controller
      * @param  \App\Animal  $animal
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $animal)
+    public function update(Request $request, Animal $animal)
     {
         try {
             global $data, $animalLocated;
-            $data = $request->json()->all();
-            $animalLocated = Animal::find($animal);
+            $data = $request->validate([
+                'animal_rfid'   => 'required|max:10|min:10', //TODO Revisar el unique (son 2 campos)
+                'gender'        => 'required|max:1',
+                'birthdate'     => 'required|date|max:10',
+                'breed_id'      => 'required',
+                'mother_rfid'   => 'required|max:10|min:10',
+                'father_rfid'   => 'required|max:10|min:10',
+                'last_weight'   => 'required',
+                'last_height'   => 'required',
+                'age_group_id'  => 'required',
+                'farm_id'       => 'required',
+                'area_id'       => 'required',
+                'lct1_id'       => 'required',
+                'lct2_id'       => 'required',
+                'user_id'       => 'required',
+                'photo'         => '',
+            ]);
+
+//            $data = $request->json()->all();
+            $animalLocated = Animal::find($animal->id);
             if($animalLocated)
             {
                DB::transaction(function ()
                {
-                    global $data, $animalLocated;
+                    global $data, $animalLocated, $request;
                     $animalLocated->animal_rfid = $data['animal_rfid'];
                     $animalLocated->gender = $data['gender'];
                     $animalLocated->birthdate = $data['birthdate'];
@@ -162,8 +241,28 @@ class AnimalController extends Controller
                           'lct2_id' => $data['lct2_id'],
                         ]);
                     }
+                    /*** Se verifica si viene la foto ***/
+                    if($request->hasFile('photo'))
+                    {
+                        $file = $request->file('photo');
+                        $file->storeAs('public/photo/', $animalLocated->animal_rfid . '.jpg');
+                        // Se actualiza en la BD el indicador
+                        $animalLocated->photo = true;
+                        $animalLocated->save();
+                    }
+                    else
+                    {
+                        if(!Storage::disk('local')->exists('/public/photo/' . $animalLocated->animal_rfid . '.jpg')) {
+                            $animalLocated->photo = false;
+                            $animalLocated->save();
+                        }
+                    }
                 });
-                return response()->json($animalLocated, 201);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json($animalLocated, 201);
+                } else {
+                    return redirect()->route('animals.index');
+                }
             }
             else
             {
@@ -199,8 +298,7 @@ class AnimalController extends Controller
             if($request->hasFile('photo'))
             {
                 $file = $request->file('photo');
-                //$nomArch = $file->getClientOriginalName();
-                $file->move(public_path() . '/photo/' . $animal_rfid);
+                $file->storeAs('public/photo/', $animal_rfid . '.jpg');
                 // Se actualiza en la BD el indicador
                 $animal = Animal::where('animal_rfid', $animal_rfid)->get()->first();
                 if ($animal)
@@ -217,7 +315,7 @@ class AnimalController extends Controller
             else
             {
                 $file = file_get_contents('php://input');
-                if(file_put_contents(public_path() . '/photo/' . $animal_rfid . '.jpg', $file))
+                if(file_put_contents(storage_path() . '/public/photo/' . $animal_rfid . '.jpg', $file))
                 {
                     $animal = Animal::where('animal_rfid', $animal_rfid)->get()->first();
                     if ($animal)

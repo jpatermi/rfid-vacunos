@@ -21,12 +21,14 @@ use Illuminate\Http\Request;
 Route::post('/users/login', ['uses'=>'UsersController@loginGetToken'])->middleware('isJson');
 
 /*** Photos ***/
-Route::post('/photo/{animal_rfid}', ['uses'=>'AnimalController@uploadPhoto'])->middleware('auth');
+Route::post('/photo/{animal_rfid}', ['uses'=>'AnimalController@uploadPhoto'])->name('animals.uploadPhoto'); //->middleware('auth');
 Route::get('/photo/{animal_rfid}', ['uses'=>'AnimalController@showPhoto']);
 
 /*** Configuration URL photo Animal ***/
 Route::get('/configurlphoto', ['uses'=>'ConfigurationController@loadUrlPhoto']);
 Route::post('/configurlphoto/{id}', ['uses'=>'ConfigurationController@updateUrlPhoto']);
+
+//	Route::resource('animals', 'AnimalController');
 
 Route::group(['middleware' => ['auth', 'isJson']], function() use($router) {
 	Route::resource('users', 'UsersController');
@@ -54,6 +56,9 @@ Route::group(['middleware' => ['auth', 'isJson']], function() use($router) {
 	Route::get('/animaldiseases/{animal_rfid}', ['uses'=>'DiseaseController@getAnimalDiseases']);
 	Route::resource('historicals', 'HistoricalWeightHeightController');
 	Route::resource('productions', 'ProductionController');
+	Route::resource('examns', 'ExamnController');
+	Route::resource('animalexamn', 'AnimalExamnController');
+	Route::resource('physicalcharacteristics', 'PhysicalCharacteristicController');
 
 	/*** Inventory ***/
 	Route::get('/totalanimals', ['uses'=>'AnimalController@totalAnimals']);
@@ -65,10 +70,10 @@ Route::group(['middleware' => ['auth', 'isJson']], function() use($router) {
 	Route::post('/configid/{animal_rfid}', ['uses'=>'ConfigurationController@updateReadValue']);
 
 	/*** Display the locations 1 belonging to the specific area. ***/
-	Route::get('/showbyarea/{area_id}', ['uses'=>'Lct1Controller@showByArea']);
+	Route::get('/showbyarea/{area_id}', ['uses'=>'Lct1Controller@showByArea'])->name('lct1s.showByArea');;
 
 	/*** Display the locations 1 belonging to the specific locations 2. ***/
-	Route::get('/showbylct1/{lct1_id}', ['uses'=>'Lct2Controller@showByLct1']);
+	Route::get('/showbylct1/{lct1_id}', ['uses'=>'Lct2Controller@showByLct1'])->name('lct2s.showByLct1');;
 
 	Route::get('/totalanimalvaccinations', ['uses'=>'VaccinationController@totalAnimalVaccinations']);
 	Route::get('/totalanimaldewormers', ['uses'=>'DewormerController@totalAnimalDewormers']);

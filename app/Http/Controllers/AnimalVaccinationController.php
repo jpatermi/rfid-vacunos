@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\AnimalVaccination;
 use App\Animal;
+use App\Vaccination;
 
 class AnimalVaccinationController extends Controller
 {
@@ -23,10 +24,16 @@ class AnimalVaccinationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
-    }
+/*        $animal_id = $request->all();
+        $animal = Animal::find($animal_id)->first();
+        $vaccinations = Vaccination::orderBy('name')->get();
+        //dd($animal, $vaccinations);
+        $model = 'animalvaccination';
+        $title = 'Aplicación de Vacuna';
+        return view('animalVaccinations.createAnimalVaccination', compact('animal', 'model', 'title', 'vaccinations'));
+*/    }
 
     /**
      * Store a newly created resource in storage.
@@ -37,14 +44,20 @@ class AnimalVaccinationController extends Controller
     public function store(Request $request)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+                'animal_id' => 'required',
+                'vaccination_id' => 'required',
+                'dose' => 'required|numeric',
+                'application_date' => 'required|date',
+            ]);
             $animal = Animal::find($data['animal_id']);
             if($animal) {
-                $anivac = $animal->vaccinations()->where('animal_id', $data['animal_id'])
-                                       ->where('vaccination_id', $data['vaccination_id'])
-                                       ->where('application_date', $data['application_date'])
-                                       ->get()
-                                       ->first();
+                $anivac = $animal->vaccinations()
+                                 ->where('animal_id', $data['animal_id'])
+                                 ->where('vaccination_id', $data['vaccination_id'])
+                                 ->where('application_date', $data['application_date'])
+                                 ->get()
+                                 ->first();
                 if(!$anivac) {
                     $anivac = AnimalVaccination::create([
                       'animal_id' => $data['animal_id'],
@@ -52,7 +65,11 @@ class AnimalVaccinationController extends Controller
                       'dose' => $data['dose'],
                       'application_date' => $data['application_date'],
                     ]);
-                    return response()->json($anivac, 201);
+                    if (request()->header('Content-Type') == 'application/json') {
+                        return response()->json($anivac, 201);
+                    } else {
+                        return redirect()->route('animalvaccination.show', $anivac->animal_id);
+                    }
                 } else {
                     return response()->json(['error' => 'El Animal: ' . $animal->animal_rfid . ' ya tiene la vacuna: ' . $anivac->name . ' de fecha: ' . $anivac->pivot->application_date->format('d/m/Y')], 406);
                 }
@@ -117,14 +134,14 @@ class AnimalVaccinationController extends Controller
         $animal = Animal::find($animal_id);
         if($animal)
         {
-            $vaccinations = $animal->vaccinations()
+            $vaccinationsAnimal = $animal->vaccinations()
                                    ->orderBy('application_date', 'desc')
                                    ->orderBy('name', 'asc')
                                    ->get();
-            if($vaccinations->isNotEmpty())
+            if($vaccinationsAnimal->isNotEmpty())
             {
                 $applications = array();
-                foreach ($vaccinations as $vaccination)
+                foreach ($vaccinationsAnimal as $vaccination)
                 {
                     $application = array('id_vac_desp_vit' => $vaccination->id,
                                          'name_vac_desp_vit' => $vaccination->name,
@@ -133,11 +150,37 @@ class AnimalVaccinationController extends Controller
                                          'id_ani_vac_desp_vit' => $vaccination->pivot->id);
                     $applications[] = $application;
                 }
-                return response()->json($applications, 200);
+                if (request()->header('Content-Type') == 'application/json')
+                {
+                    return response()->json($applications, 200);
+                }
+                else
+                {
+                    $vaccinations = Vaccination::orderBy('name')->get();
+                    //$applications = $vaccinationsAnimal;
+                    $model        = 'animalvaccination';
+                    $title        = 'Vacunas aplicadas';
+                    $label         = 'Vacuna';
+                    $nomCampoVacDewVit = 'vaccination_id';
+                    return view('animalVacDewVit.showAnimalVacDewVit', compact('applications', 'animal', 'model', 'title', 'vaccinations', 'label', 'nomCampoVacDewVit'));
+                }
             }
             else
             {
-                return response()->json(['error' => 'el Animal ' . $animal->animal_rfid . ' no ha sido vacunado aún'], 406);
+                if (request()->header('Content-Type') == 'application/json')
+                {
+                    return response()->json(['error' => 'el Animal ' . $animal->animal_rfid . ' no ha sido vacunado aún'], 406);
+                }
+                else
+                {
+                    $vaccinations = Vaccination::orderBy('name')->get();
+                    $applications = '';
+                    $model        = 'animalvaccination';
+                    $title        = 'Vacunas aplicadas';
+                    $label         = 'Vacuna';
+                    $nomCampoVacDewVit = 'vaccination_id';
+                    return view('animalVacDewVit.showAnimalVacDewVit', compact('applications', 'animal', 'model', 'title', 'vaccinations', 'label', 'nomCampoVacDewVit'));
+                }
             }
         }
         else
@@ -154,7 +197,9 @@ class AnimalVaccinationController extends Controller
      */
     public function edit($id)
     {
-        //
+        //dd($id);
+        //   $application = AnimalVaccination::find($id);
+        // return view('animalVaccinations.editAnimalVaccination', compact('application'));
     }
 
     /**
@@ -167,7 +212,12 @@ class AnimalVaccinationController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+                'animal_id' => 'required',
+                'vaccination_id' => 'required',
+                'dose' => 'required|numeric',
+                'application_date' => 'required|date',
+            ]);
             $anivac = AnimalVaccination::find($id);
             if($anivac) {
                 $anivac->animal_id = $data['animal_id'];
@@ -175,7 +225,11 @@ class AnimalVaccinationController extends Controller
                 $anivac->dose = $data['dose'];
                 $anivac->application_date = $data['application_date'];
                 $anivac->save();
-                return response()->json($anivac, 201);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json($anivac, 201);
+                } else {
+                    return redirect()->route('animalvaccination.show', $anivac->animal_id);
+                }
             } else {
                 return response()->json(['error' => 'Aplicación de Vacuna no existente'], 406);
             }
@@ -196,7 +250,11 @@ class AnimalVaccinationController extends Controller
             $anivac = AnimalVaccination::find($id);
             if($anivac) {
                 $anivac->delete();
-                return response()->json(['exitoso' => 'Aplicación eliminada con éxito'], 204);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json(['exitoso' => 'Aplicación eliminada con éxito'], 204);
+                } else {
+                    return redirect()->route('animalvaccination.show', $anivac->animal_id);
+                }
             } else {
                 return response()->json(['error' => 'Aplicación de Vacuna no existente'], 406);
             }

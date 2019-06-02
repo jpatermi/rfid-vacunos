@@ -16,7 +16,11 @@ class BreedController extends Controller
     public function index()
     {
         $breeds = Breed::all()->sortBy('name')->values();
-        return response()->json($breeds, 200);
+        if (request()->header('Content-Type') == 'application/json') {
+            return response()->json($breeds, 200);
+        } else {
+            return view('/breeds/indexBreed', compact('breeds'));
+        }
     }
 
     /**
@@ -26,7 +30,7 @@ class BreedController extends Controller
      */
     public function create()
     {
-        //
+        return view('breeds.createBreed');
     }
 
     /**
@@ -38,11 +42,23 @@ class BreedController extends Controller
     public function store(Request $request)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+                'name' => 'required'
+            ]);
+
+            // if (request()->header('Content-Type') == 'application/json') {
+            //     $data = $request->json()->all();
+            // } else {
+            //     $data = $request->all();
+            // }
             $breed = Breed::create([
               'name' => $data['name']
             ]);
-            return response()->json($breed, 201);
+            if (request()->header('Content-Type') == 'application/json') {
+                return response()->json($breed, 201);
+            } else {
+                return redirect()->route('breeds.index');
+            }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
         }
@@ -54,15 +70,25 @@ class BreedController extends Controller
      * @param  \App\Breed  $breed
      * @return \Illuminate\Http\Response
      */
-    public function show($breed)
+    public function show(Breed $breed)
     {
-        $breed = Breed::find($breed);
-        if($breed) {
-            return response()->json($breed, 200);
-        } else {
-            return response()->json(['error' => 'Raza no existente'], 406);
+        $breed = Breed::find($breed->id);
+        if (request()->header('Content-Type') == 'application/json')
+        {
+            if($breed)
+            {
+                return response()->json($breed, 200);
+            }
+            else
+            {
+                return response()->json(['error' => 'Raza no existente'], 406);
+            }
         }
-    }
+        else
+        {
+            return view('/breeds/showBreed', compact('breed'));
+        }
+}
 
     /**
      * Show the form for editing the specified resource.
@@ -72,7 +98,8 @@ class BreedController extends Controller
      */
     public function edit(Breed $breed)
     {
-        //
+        //$breed = Breed::find($breed);
+        return view('breeds.editBreed', ['breed' => $breed]);
     }
 
     /**
@@ -82,15 +109,26 @@ class BreedController extends Controller
      * @param  \App\Breed  $breed
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $breed)
+    public function update(Request $request, Breed $breed)
     {
         try {
-            $data = $request->json()->all();
-            $breed = Breed::find($breed);
+            $data = $request->validate([
+                'name' => 'required'
+            ]);
+
+            $breed = Breed::find($breed->id);
             if($breed) {
                 $breed->name = $data['name'];
                 $breed->save();
-                return response()->json($breed, 201);
+                if (request()->header('Content-Type') == 'application/json')
+                {
+                    return response()->json($breed, 201);
+                }
+                else
+                {
+                    return redirect()->route('breeds.index');
+                }
+
             } else {
                 return response()->json(['error' => 'Raza no existente'], 406);
             }
@@ -105,12 +143,12 @@ class BreedController extends Controller
      * @param  \App\Breed  $breed
      * @return \Illuminate\Http\Response
      */
-    public function destroy($breed)
+    public function destroy(Breed $breed)
     {
         try {
-            $breedLocated = Breed::find($breed);
+            $breedLocated = Breed::find($breed->id);
             if($breedLocated) {
-                $animals = Animal::where('breed_id', $breed)->get();
+                $animals = Animal::where('breed_id', $breed->id)->get();
                 if ($animals->isNotEmpty()) {
                     $animalRFID = array();
                     foreach ($animals as $animal) {
@@ -119,7 +157,14 @@ class BreedController extends Controller
                     return response()->json(['conflicto' => $animalRFID], 409);
                 } else {
                     $breedLocated->delete();
-                    return response()->json(['exitoso' => 'Raza: ' . $breedLocated->name . ' eliminada con éxito'], 204);
+                    if (request()->header('Content-Type') == 'application/json')
+                    {
+                        return response()->json(['exitoso' => 'Raza: ' . $breedLocated->name . ' eliminada con éxito'], 204);
+                    }
+                    else
+                    {
+                        return redirect()->route('breeds.index');
+                    }
                 }
             } else {
                 return response()->json(['error' => 'Raza no existente'], 406);

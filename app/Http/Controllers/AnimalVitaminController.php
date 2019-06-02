@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\AnimalVitamin;
 use Illuminate\Http\Request;
 use App\Animal;
+use App\Vitamin;
 
 class AnimalVitaminController extends Controller
 {
@@ -37,14 +38,19 @@ class AnimalVitaminController extends Controller
     public function store(Request $request)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+                'animal_id'        => 'required',
+                'vitamin_id'       => 'required',
+                'dose'             => 'required|numeric',
+                'application_date' => 'required|date',
+            ]);
             $animal = Animal::find($data['animal_id']);
             if($animal) {
                 $anivit = $animal->vitamins()->where('animal_id', $data['animal_id'])
-                                       ->where('vitamin_id', $data['vitamin_id'])
-                                       ->where('application_date', $data['application_date'])
-                                       ->get()
-                                       ->first();
+                                 ->where('vitamin_id', $data['vitamin_id'])
+                                 ->where('application_date', $data['application_date'])
+                                 ->get()
+                                 ->first();
                 if(!$anivit) {
                     $anivit = AnimalVitamin::create([
                       'animal_id' => $data['animal_id'],
@@ -52,7 +58,11 @@ class AnimalVitaminController extends Controller
                       'dose' => $data['dose'],
                       'application_date' => $data['application_date'],
                     ]);
-                    return response()->json($anivit, 201);
+                    if (request()->header('Content-Type') == 'application/json') {
+                        return response()->json($anivit, 201);
+                    } else {
+                        return redirect()->route('animalvitamin.show', $anivit->animal_id);
+                    }
                 } else {
                     return response()->json(['error' => 'El Animal: ' . $animal->animal_rfid . ' ya tiene la Vitamina: ' . $anivit->name . ' de fecha: ' . $anivit->pivot->application_date->format('d/m/Y')], 406);
                 }
@@ -77,9 +87,9 @@ class AnimalVitaminController extends Controller
         if($animal)
         {
             $vitamins = $animal->vitamins()
-                                   ->orderBy('application_date', 'desc')
-                                   ->orderBy('name', 'asc')
-                                   ->get();
+                               ->orderBy('application_date', 'desc')
+                               ->orderBy('name', 'asc')
+                               ->get();
             if($vitamins->isNotEmpty())
             {
                 $applications = array();
@@ -92,11 +102,37 @@ class AnimalVitaminController extends Controller
                                          'id_ani_vac_desp_vit' => $vitamin->pivot->id);
                     $applications[] = $application;
                 }
-                return response()->json($applications, 200);
+                if (request()->header('Content-Type') == 'application/json')
+                {
+                    return response()->json($applications, 200);
+                }
+                else
+                {
+                    $vaccinations = Vitamin::orderBy('name')->get();
+                    //$applications = $dewormersAnimal;
+                    $model        = 'animalvitamin';
+                    $title        = 'Vitaminas aplicadas';
+                    $label        = 'Vitamina';
+                    $nomCampoVacDewVit = 'vitamin_id';
+                    return view('animalVacDewVit.showAnimalVacDewVit', compact('applications', 'animal', 'model', 'title', 'vaccinations', 'label', 'nomCampoVacDewVit'));
+                }
             }
             else
             {
-                return response()->json(['error' => 'el Animal ' . $animal->animal_rfid . ' no tiene Vitaminas aún'], 406);
+                if (request()->header('Content-Type') == 'application/json')
+                {
+                    return response()->json(['error' => 'el Animal ' . $animal->animal_rfid . ' no tiene Vitaminas aún'], 406);
+                }
+                else
+                {
+                    $vaccinations = Vitamin::orderBy('name')->get();
+                    $applications = '';
+                    $model        = 'animalvitamin';
+                    $title        = 'Vitaminas aplicadas';
+                    $label        = 'Vitamina';
+                    $nomCampoVacDewVit = 'vitamin_id';
+                    return view('animalVacDewVit.showAnimalVacDewVit', compact('applications', 'animal', 'model', 'title', 'vaccinations', 'label', 'nomCampoVacDewVit'));
+                }
             }
         }
         else
@@ -126,7 +162,12 @@ class AnimalVitaminController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+                'animal_id'        => 'required',
+                'vitamin_id'       => 'required',
+                'dose'             => 'required|numeric',
+                'application_date' => 'required|date',
+            ]);
             $anivit = AnimalVitamin::find($id);
             if($anivit) {
                 $anivit->animal_id = $data['animal_id'];
@@ -134,7 +175,11 @@ class AnimalVitaminController extends Controller
                 $anivit->dose = $data['dose'];
                 $anivit->application_date = $data['application_date'];
                 $anivit->save();
-                return response()->json($anivit, 201);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json($anivit, 201);
+                } else {
+                    return redirect()->route('animalvitamin.show', $anivit->animal_id);
+                }
             } else {
                 return response()->json(['error' => 'Aplicación de Vitamina no existente'], 406);
             }
@@ -155,7 +200,11 @@ class AnimalVitaminController extends Controller
             $anivit = AnimalVitamin::find($id);
             if($anivit) {
                 $anivit->delete();
-                return response()->json(['exitoso' => 'Aplicación eliminada con éxito'], 204);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json(['exitoso' => 'Aplicación eliminada con éxito'], 204);
+                } else {
+                    return redirect()->route('animalvitamin.show', $anivit->animal_id);
+                }
             } else {
                 return response()->json(['error' => 'Aplicación de Vitamina no existente'], 406);
             }

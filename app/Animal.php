@@ -136,6 +136,16 @@ class Animal extends Model
                     ->wherePivot('deleted_at', null);
     }
     /**
+     * Get the comments for the examn.
+    */
+    public function examns()
+    {
+        return $this->belongsToMany('App\Examn')
+                    ->using('App\AnimalExamn')
+                    ->withPivot('application_date', 'id')
+                    ->wherePivot('deleted_at', null);
+    }
+    /**
      * Get the comments for the age group.
     */
     public function ageGroup()
@@ -169,5 +179,12 @@ class Animal extends Model
     public function productions()
     {
         return $this->hasMany('App\Production');
+    }
+    /**
+     * Get the comments for the animals.
+    */
+    public function physicalCharacteristics()
+    {
+        return $this->hasMany('App\PhysicalCharacteristic');
     }
 }
