@@ -108,10 +108,10 @@ class AnimalVaccinationController extends Controller
                     for ($x = 1; $x <= (38 - strlen($name2)); $x++) {
                         $name = $name . ' ';
                     }
-                    $application = array('id_vaccination' => $vaccination->id,
-                                         'application' => $name . $vaccination->pivot->application_date->format('d/m/Y'),
+                    $application = array('id_vaccination'   => $vaccination->id,
+                                         'application'      => $name . $vaccination->pivot->application_date->format('d/m/Y'),
                                          'application_date' => $vaccination->pivot->application_date->format('Y-m-d'),
-                                         'id_anivac' => $vaccination->pivot->id);
+                                         'id_anivac'        => $vaccination->pivot->id);
                     $applications[] = $application;
                 }
                 return response()->json($applications, 200);
@@ -143,10 +143,10 @@ class AnimalVaccinationController extends Controller
                 $applications = array();
                 foreach ($vaccinationsAnimal as $vaccination)
                 {
-                    $application = array('id_vac_desp_vit' => $vaccination->id,
-                                         'name_vac_desp_vit' => $vaccination->name,
-                                         'dose' => $vaccination->pivot->dose,
-                                         'application_date' => $vaccination->pivot->application_date->format('d/m/Y'),
+                    $application = array('id_vac_desp_vit'     => $vaccination->id,
+                                         'name_vac_desp_vit'   => $vaccination->name,
+                                         'dose'                => $vaccination->pivot->dose,
+                                         'application_date'    => $vaccination->pivot->application_date->format('d/m/Y'),
                                          'id_ani_vac_desp_vit' => $vaccination->pivot->id);
                     $applications[] = $application;
                 }

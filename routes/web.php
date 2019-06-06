@@ -38,9 +38,12 @@ Route::resource('animalvaccination', 'AnimalVaccinationController');
 /*** Desparasitaciones del Animal ***/
 Route::resource('animaldewormer', 'AnimalDewormerController');
 
-/*** Vitaminas del Animal ***/
+// ### Vitaminas del Animal ###
 Route::resource('animalvitamin', 'AnimalVitaminController');
 
+// ### Enfermedades del Animal ###
+Route::get('/animaldiseases/{animal_rfid}', ['uses'=>'DiseaseController@getAnimalDiseases'])->name('disease.GetAnimalDiseases');
+Route::resource('diseases', 'DiseaseController');
 
 /*** Ubicaciones ***/
 Route::get('/showbyarea/{area}', ['uses'=>'Lct1Controller@showByArea'])->name('lct1s.showByArea');

@@ -48,6 +48,9 @@
                           <a href="{{ route('animalvitamin.show', $animal) }}" class="btn btn-link text-primary">
                               <span class="material-icons">card_travel</span>
                           </a>
+                          <a href="{{ route('disease.GetAnimalDiseases', $animal) }}" class="btn btn-link text-primary">
+                              <span class="material-icons">alarm</span>
+                          </a>
                           <button type="submit" class="btn btn-link text-primary">
                               <span class="material-icons">delete</span>
                           </button>
@@ -60,6 +63,8 @@
         @else
             <p>No existen Razas registradas.</p>
         @endif
+      </div>
+      <div class="card-footer">
       </div>
     </div>
 @endsection

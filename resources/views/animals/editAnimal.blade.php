@@ -169,9 +169,11 @@
 				<div class="nav justify-content-center">
 			  		<button type="submit" class="col-md-2 btn btn-primary">Actualizar Animal</button>
 			  		<a href="#" class="btn btn-primary ml-2" data-toggle="modal" data-target="#show">Características Físicas</a>
-					<a href="{{ route('animals.index') }}" class="btn btn-link">Regresar al listado de Animales</a>
 				</div>
 			</form>
+		</div>
+		<div class="card-footer">
+			<a href="{{ route('animals.index') }}" class="btn btn-link">Regresar al listado de Animales</a>
 		</div>
 	</div>
 @include('physicalCharacteristics.showPhysicalCharacteristics')
