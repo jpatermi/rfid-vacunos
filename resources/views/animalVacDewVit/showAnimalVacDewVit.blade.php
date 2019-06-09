@@ -1,4 +1,4 @@
-@extends('template')
+@extends('layouts.app')
 
 @section('content')
     <div class="card">
@@ -9,7 +9,7 @@
             </h3>
             <div>
               <a class="btn btn-primary mb-2" href="#" data-toggle="modal" data-target="#create">Agregar Aplicación</a>
-              <a href="{{ route('animals.index') }}" class="btn-link btn pb-3">Regresar al listado de Animales</a>
+              <a href="{{ route('animals.show', $animal->animal_rfid) }}" class="btn-link btn pb-3">Regresar al Detalle</a>
             </div>
         </div>
       </div>
@@ -38,10 +38,10 @@
                               <span class="material-icons"  data-toggle="tooltip" data-placement="top" title="Editar Aplicación">edit</span>
                           </a>--}}
                           <a href="{{ $application['id_ani_vac_desp_vit'] }}" class="btn btn-link text-primary" data-toggle="modal" data-target="#edit" name="{{ old('id', $application['id_ani_vac_desp_vit']) }}" onclick="LlenaCampos({{ $application['id_ani_vac_desp_vit'] }}, {{ $animal->id }}, {{ $application['id_vac_desp_vit'] }}, {{ $application['dose'] }}, `{{ $application['application_date'] }}`)">
-                              <span class="material-icons" data-toggle="tooltip" data-placement="top" title="Editar Aplicación" >edit</span>
+                              <span data-toggle="tooltip" data-placement="top" title="Editar Aplicación" ><img class="" src="{{ asset('img/ico/baseline-edit-24px.svg') }}" alt="Editar"></span>
                           </a>
                           <button type="submit" class="btn btn-link text-primary" onclick="return confirm('¿Esta seguro de eliminar la aplicación: {{ $application['name_vac_desp_vit'] }}?')">
-                              <span class="material-icons" data-toggle="tooltip" data-placement="top" title="Eliminar Aplicación">delete</span>
+                              <span data-toggle="tooltip" data-placement="top" title="Eliminar Aplicación"><img class="" src="{{ asset('img/ico/baseline-delete-24px.svg') }}" alt="Eliminar"></span>
                           </button>
                       </form>
                   </td>
@@ -55,14 +55,13 @@
         @endif
       </div>
       <div class="card-footer">
-        <a href="{{ route('animals.index') }}" class="btn-link btn">Regresar al listado de Animales</a>
-        <!--Redirect::back();-->
+        <a href="{{ route('animals.show', $animal->animal_rfid) }}" class="btn-link btn">Regresar al Detalle</a>
       </div>
     </div>
     <input type="text" name="nomCampoVacDewVit" id="nomCampoVacDewVit" hidden value="{{ $nomCampoVacDewVit }}">
 @include('animalVacDewVit.createAnimalVacDewVit')
 @endsection
-@section('script_fecha')
+@section('scripts')
   <script>
 /*    $.when( $.ready ).then(function() {
         var tableReg = document.getElementById('datos');
@@ -117,6 +116,23 @@
       document.querySelector('#vaccinationEdit').value = vaccination_id;
       //console.log(id, animal_id, vaccination_id, dose, convertDateFormatUSA_to_VZLA(application_date), w);
     };
+    //### Se usa en el Create ###
+    $("#dateface").change(function(event) {
+      $( "#application_date" ).attr("value", convertDateFormatVZLA_to_USA(`${dateface.value}`));
+    });
 
+    function convertDateFormatVZLA_to_USA(string) {
+      var info = string.split('/');
+      return info[2] + '-' + info[1] + '-' + info[0];
+    };
+    //### Se usa en el Edit ###
+    $("#dateFaceEdit").change(function(event) {
+      $( "#applicationDateEdit" ).attr("value", convertDateFormatVZLA_to_USA(`${dateFaceEdit.value}`));
+    });
+
+    function convertDateFormatVZLA_to_USA(string) {
+      var info = string.split('/');
+      return info[2] + '-' + info[1] + '-' + info[0];
+    };
   </script>
 @endsection

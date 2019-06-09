@@ -59,16 +59,3 @@
     </div>
   </div>
 </div>
-
-@section('script_area_lct1_lct2')
-    <script>
-        $("#dateface").change(function(event) {
-          $( "#application_date" ).attr("value", convertDateFormatVZLA_to_USA(`${dateface.value}`));
-        });
-
-        function convertDateFormatVZLA_to_USA(string) {
-          var info = string.split('/');
-          return info[2] + '-' + info[1] + '-' + info[0];
-        };
-    </script>
-@endsection

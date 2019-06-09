@@ -15,7 +15,14 @@ class DewormerController extends Controller
     public function index()
     {
         $dewormer = Dewormer::all()->sortBy('name')->values();
-        return response()->json($dewormer, 200);
+        if (request()->header('Content-Type') == 'application/json') {
+            return response()->json($dewormer, 200);
+        } else {
+            $varVacDewVits = $dewormer;
+            $labelVacDewVit = 'Desparasitante';
+            $model = 'dewormers';
+            return view('configuration.VacDewVit.indexVacDewVit', compact('varVacDewVits', 'labelVacDewVit', 'model'));
+        }
     }
 
     /**
@@ -25,7 +32,9 @@ class DewormerController extends Controller
      */
     public function create()
     {
-        //
+        $labelVacDewVit = 'Desparasitante';
+        $model = 'dewormers';
+        return view('configuration.VacDewVit.createVacDewVit', compact('labelVacDewVit', 'model'));
     }
 
     /**
@@ -37,12 +46,19 @@ class DewormerController extends Controller
     public function store(Request $request)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+              'name' => 'required',
+              'characteristic' => 'required',
+            ]);
             $dewormer = Dewormer::create([
               'name' => $data['name'],
               'characteristic' => $data['characteristic'],
             ]);
-            return response()->json($dewormer, 201);
+            if (request()->header('Content-Type') == 'application/json') {
+                return response()->json($dewormer, 201);
+            } else {
+                return redirect()->route('dewormers.index');
+            }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
         }
@@ -72,7 +88,10 @@ class DewormerController extends Controller
      */
     public function edit(Dewormer $dewormer)
     {
-        //
+        $varVacDewVit = Dewormer::find($dewormer->id);
+        $labelVacDewVit = 'Desparasitante';
+        $model = 'dewormers';
+        return view('configuration.VacDewVit.editVacDewVit', compact('varVacDewVit', 'labelVacDewVit', 'model'));
     }
 
     /**
@@ -85,13 +104,20 @@ class DewormerController extends Controller
     public function update(Request $request, $dewormer)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+              'name' => 'required',
+              'characteristic' => 'required',
+            ]);
             $dewormer = Dewormer::find($dewormer);
             if($dewormer) {
                 $dewormer->name = $data['name'];
                 $dewormer->characteristic = $data['characteristic'];
                 $dewormer->save();
-                return response()->json($dewormer, 201);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json($dewormer, 201);
+                } else {
+                    return redirect()->route('dewormers.index');
+                }
             } else {
                 return response()->json(['error' => 'Desparasitante no existente'], 406);
             }
@@ -120,7 +146,11 @@ class DewormerController extends Controller
                     return response()->json(['conflicto' => $animalRFID], 409);
                 } else {
                     $dewormer->delete();
-                    return response()->json(['exitoso' => 'Desparasitante: ' . $dewormer->name . ' eliminada con éxito'], 204);
+                    if (request()->header('Content-Type') == 'application/json') {
+                        return response()->json(['exitoso' => 'Desparasitante: ' . $dewormer->name . ' eliminada con éxito'], 204);
+                    } else {
+                        return redirect()->route('dewormers.index');
+                    }
                 }
             } else {
                 return response()->json(['error' => 'Desparasitante no existente'], 406);

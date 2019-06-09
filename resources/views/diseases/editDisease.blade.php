@@ -1,4 +1,4 @@
-@extends('template')
+@extends('layouts.app')
 
 @section('content')
     <div class="card">
@@ -99,7 +99,7 @@
               <input type="button" class="btn btn-primary mt-2 ml-1" id="btn_add" value="Agregar">
             </div>
           </div>
-          <table class="table table-sm table-striped table-hover" id="table_tratamiento">
+          <table class="table table-striped table-hover" id="table_tratamiento">
             <thead class="thead-dark">
               <th>Tratamiento</th>
               <th>Indicación</th>
@@ -107,9 +107,9 @@
             </thead>
             <tbody>
               @foreach($disease->treatments as $treatment)
-                <tr class="selected" id="filaT{{ $treatment->id }}">
+                <tr id="filaT{{ $treatment->id }}">
                   <td><input type="hidden" name="treatment_id[]" value="{{ $treatment->id }}">{{ $treatment->name }}</td>
-                  <td><input type="text" name="indication[]" value="{{ $treatment->pivot->indication }}"></td>
+                  <td><input type="hidden" name="indication[]" value="{{ $treatment->pivot->indication }}">{{ $treatment->pivot->indication }}</td>
                   <td><button type="button" class="btn btn-danger" onclick="eliminarT({{ $treatment->id }})">X</button></td>
                 </tr>
               @endforeach
@@ -129,7 +129,7 @@
       </div>
     </div>
 @endsection
-@section('script_area_lct1_lct2')
+@section('scripts')
     <script>
         $("#dateface").change(function(event) {
           $( "#review_date" ).attr("value", convertDateFormatVZLA_to_USA(`${dateface.value}`));
@@ -160,7 +160,7 @@
           indicacion = $("#pindicacion").val();
 
           if (indicacion != "") {
-            var fila = '<tr class="selected" id="fila' + cont +'"><td><input type="hidden" name="treatment_id[]" value="'+idTratamiento+'">'+tratamiento+'</td><td><input type="text" name="indication[]" value="'+indicacion+'"></td><td><button type="button" class="btn btn-danger" onclick="eliminar('+cont+')">X</button></td></tr>';
+            var fila = '<tr id="fila' + cont +'"><td><input type="hidden" name="treatment_id[]" value="'+idTratamiento+'">'+tratamiento+'</td><td><input type="hidden" name="indication[]" value="'+indicacion+'">'+indicacion+'</td><td><button type="button" class="btn btn-danger" onclick="eliminar('+cont+')">X</button></td></tr>';
             cont++;
             limpiar();
             $("#table_tratamiento").append(fila);

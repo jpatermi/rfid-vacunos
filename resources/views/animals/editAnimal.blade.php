@@ -1,4 +1,4 @@
-@extends('template')
+@extends('layouts.app')
 @section('content')
 	<div class="card">
 		<h4 class="card-header font-weight-bold text-center">Actualizar Animal</h4>
@@ -168,7 +168,7 @@
 				<!-- -->
 				<div class="nav justify-content-center">
 			  		<button type="submit" class="col-md-2 btn btn-primary">Actualizar Animal</button>
-			  		<a href="#" class="btn btn-primary ml-2" data-toggle="modal" data-target="#show">Características Físicas</a>
+			  		{{--<a href="#" class="btn btn-primary ml-2" data-toggle="modal" data-target="#show">Características Físicas</a>--}}
 				</div>
 			</form>
 		</div>
@@ -176,9 +176,9 @@
 			<a href="{{ route('animals.index') }}" class="btn btn-link">Regresar al listado de Animales</a>
 		</div>
 	</div>
-@include('physicalCharacteristics.showPhysicalCharacteristics')
+{{--@include('physicalCharacteristics.showPhysicalCharacteristics')--}}
 @endsection
-@section('script_area_lct1_lct2')
+@section('scripts')
     <script>
 		$.when( $.ready ).then(function() {
           $( "#dateface" ).attr( "value", convertDateFormatUSA_to_VZLA(`${dateface.value}`));

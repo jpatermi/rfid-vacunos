@@ -23,9 +23,11 @@ class ProductionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $animal_id = $request->all();
+        $animal = Animal::find($animal_id)->first();
+        return view('productions.createProduction', compact('animal'));
     }
 
     /**
@@ -37,7 +39,12 @@ class ProductionController extends Controller
     public function store(Request $request)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+              'animal_id' => 'required',
+              'colostrum' => 'required|numeric',
+              'milk' => 'required|numeric',
+              'production_date' => 'required|date',
+            ]);
             $animal = Animal::find($data['animal_id']);
             if($animal) {
                 $productions = $animal->productions()->where('animal_id', $data['animal_id'])
@@ -52,7 +59,11 @@ class ProductionController extends Controller
                       'milk' => $data['milk'],
                       'production_date' => $data['production_date'],
                     ]);
-                    return response()->json($productions, 201);
+                    if (request()->header('Content-Type') == 'application/json') {
+                        return response()->json($productions, 201);
+                    } else {
+                        return redirect()->route('productions.show', $animal->id);
+                    }
                 } else {
                     return response()->json(['error' => 'El Animal: ' . $animal->animal_rfid . ' ya tiene registrado el Calostro: ' . $productions->colostrum . ' y la Leche: ' . $productions->milk . ' de Fecha: ' . $productions->production_date->format('d/m/Y')], 406);
                 }
@@ -68,7 +79,7 @@ class ProductionController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Production  $animalVitamin
+     * @param  \App\Production  $production
      * @return \Illuminate\Http\Response
      */
     public function show($animal_id)
@@ -100,11 +111,20 @@ class ProductionController extends Controller
                                          'line' => $line);
                     $applications[] = $application;
                 }
-                return response()->json($applications, 200);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json($applications, 200);
+                } else {
+                    return view('/productions/showProduction', compact('animal', 'applications'));
+                }
             }
             else
             {
-                return response()->json(['error' => 'el Animal ' . $animal->animal_rfid . ' no tiene Producción aún'], 406);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json(['error' => 'el Animal ' . $animal->animal_rfid . ' no tiene Producción aún'], 406);
+                } else {
+                    $applications = '';
+                    return view('/productions/showProduction', compact('animal', 'applications'));
+                }
             }
         }
         else
@@ -116,33 +136,44 @@ class ProductionController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Production  $animalVitamin
+     * @param  \App\Production  $production
      * @return \Illuminate\Http\Response
      */
-    public function edit(Production $animalVitamin)
+    public function edit(Production $production)
     {
-        //
+        $animal = Animal::find($production->animal_id);
+        $production = Production::find($production->id);
+        return view('productions.editProduction', compact('animal', 'production'));
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Production  $animalVitamin
+     * @param  \App\Production  $production
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Production $production)
     {
         try {
-            $data = $request->json()->all();
-            $productions = Production::find($id);
+            $data = $request->validate([
+              'animal_id' => 'required',
+              'colostrum' => 'required|numeric',
+              'milk' => 'required|numeric',
+              'production_date' => 'required|date',
+            ]);
+            $productions = Production::find($production->id);
             if($productions) {
                 $productions->animal_id = $data['animal_id'];
                 $productions->colostrum = $data['colostrum'];
                 $productions->milk = $data['milk'];
                 $productions->production_date = $data['production_date'];
                 $productions->save();
-                return response()->json($productions, 201);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json($productions, 201);
+                } else {
+                    return redirect()->route('productions.show', $productions->animal_id);
+                }
             } else {
                 return response()->json(['error' => 'Producción no existente'], 406);
             }
@@ -154,7 +185,7 @@ class ProductionController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Production  $animalVitamin
+     * @param  \App\Production  $production
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
@@ -163,7 +194,11 @@ class ProductionController extends Controller
             $production = Production::find($id);
             if($production) {
                 $production->delete();
-                return response()->json(['exitoso' => 'Producción eliminada con éxito'], 204);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json(['exitoso' => 'Producción eliminada con éxito'], 204);
+                } else {
+                    return redirect()->route('productions.show', $production->animal_id);
+                }
             } else {
                 return response()->json(['error' => 'Producción no existente'], 406);
             }

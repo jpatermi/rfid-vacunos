@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Cause;
 use Illuminate\Http\Request;
+use App\Disease;
 
 class CauseController extends Controller
 {
@@ -15,7 +16,14 @@ class CauseController extends Controller
     public function index()
     {
         $causes = Cause::all()->sortBy('name')->values();
-        return response()->json($causes, 200);
+        if (request()->header('Content-Type') == 'application/json') {
+            return response()->json($causes, 200);
+        } else {
+            $varGenerals = $causes;
+            $labelGeneral = 'Causa';
+            $model = 'causes';
+            return view('configuration.general.indexGeneral', compact('varGenerals', 'labelGeneral', 'model'));
+        }
     }
 
     /**
@@ -25,7 +33,9 @@ class CauseController extends Controller
      */
     public function create()
     {
-        //
+        $labelGeneral = 'Causa';
+        $model = 'causes';
+        return view('configuration.general.createGeneral', compact('labelGeneral', 'model'));
     }
 
     /**
@@ -37,11 +47,17 @@ class CauseController extends Controller
     public function store(Request $request)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+                'name' => 'required'
+            ]);
             $cause = Cause::create([
               'name' => $data['name']
             ]);
-            return response()->json($cause, 201);
+            if (request()->header('Content-Type') == 'application/json') {
+                return response()->json($cause, 201);
+            } else {
+                return redirect()->route('causes.index');
+            }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
         }
@@ -68,9 +84,12 @@ class CauseController extends Controller
      * @param  \App\Cause  $cause
      * @return \Illuminate\Http\Response
      */
-    public function edit(Cause $cause)
+    public function edit($cause)
     {
-        //
+        $varGeneral = Cause::find($cause);
+        $labelGeneral = 'Causa';
+        $model = 'causes';
+        return view('configuration.general.editGeneral', compact('varGeneral', 'labelGeneral', 'model'));
     }
 
     /**
@@ -83,12 +102,18 @@ class CauseController extends Controller
     public function update(Request $request, $cause)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+                'name' => 'required'
+            ]);
             $cause = Cause::find($cause);
             if($cause) {
                 $cause->name = $data['name'];
                 $cause->save();
-                return response()->json($cause, 201);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json($cause, 201);
+                } else {
+                    return redirect()->route('causes.index');
+                }
             } else {
                 return response()->json(['error' => 'Causa no existente'], 406);
             }
@@ -108,16 +133,20 @@ class CauseController extends Controller
         try {
             $causeLocated = Cause::find($cause);
             if($causeLocated) {
-                $medicalDiagnostics = MedicalDiagnostic::where('cause_id', $cause)->get();
-                if ($medicalDiagnostics->isNotEmpty()) {
+                $diseases = Disease::where('cause_id', $cause)->get();
+                if ($diseases->isNotEmpty()) {
                     $animalRFID = array();
-                    foreach ($medicalDiagnostics as $medicalDiagnostic) {
-                        $animalRFID[] = $medicalDiagnostic->id;
+                    foreach ($diseases as $disease) {
+                        $animalRFID[] = $disease->animal->animal_rfid;
                     }
                     return response()->json(['conflicto' => $animalRFID], 409);
                 } else {
                     $causeLocated->delete();
-                    return response()->json(['exitoso' => 'Causa: ' . $causeLocated->name . ' eliminada con éxito'], 204);
+                    if (request()->header('Content-Type') == 'application/json') {
+                        return response()->json(['exitoso' => 'Causa: ' . $causeLocated->name . ' eliminada con éxito'], 204);
+                    } else {
+                        return redirect()->route('causes.index');
+                    }
                 }
             } else {
                 return response()->json(['error' => 'Causa no existente'], 406);

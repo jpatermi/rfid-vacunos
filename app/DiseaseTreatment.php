@@ -37,4 +37,19 @@ class DiseaseTreatment extends Pivot
      */
     protected $dates = ['deleted_at',];
     //protected $table = ['disease_treatmen',];
+
+    /**
+     * Get the comments for the disease.
+    */
+    public function disease()
+    {
+        return $this->belongsTo('App\Disease');
+    }
+    /**
+     * Get the comments for the treatment.
+    */
+    public function treatment()
+    {
+        return $this->belongsTo('App\Treatment');
+    }
 }

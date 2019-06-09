@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Diagnostic;
 use Illuminate\Http\Request;
+use App\Disease;
 
 class DiagnosticController extends Controller
 {
@@ -15,7 +16,14 @@ class DiagnosticController extends Controller
     public function index()
     {
         $diagnostics = Diagnostic::all()->sortBy('name')->values();
-        return response()->json($diagnostics, 200);
+        if (request()->header('Content-Type') == 'application/json') {
+            return response()->json($diagnostics, 200);
+        } else {
+            $varGenerals = $diagnostics;
+            $labelGeneral = 'Diagnóstico';
+            $model = 'diagnostics';
+            return view('configuration.general.indexGeneral', compact('varGenerals', 'labelGeneral', 'model'));
+        }
     }
 
     /**
@@ -25,7 +33,9 @@ class DiagnosticController extends Controller
      */
     public function create()
     {
-        //
+        $labelGeneral = 'Diagnóstico';
+        $model = 'diagnostics';
+        return view('configuration.general.createGeneral', compact('labelGeneral', 'model'));
     }
 
     /**
@@ -37,11 +47,17 @@ class DiagnosticController extends Controller
     public function store(Request $request)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+                'name' => 'required'
+            ]);
             $diagnostic = Diagnostic::create([
               'name' => $data['name']
             ]);
-            return response()->json($diagnostic, 201);
+            if (request()->header('Content-Type') == 'application/json') {
+                return response()->json($diagnostic, 201);
+            } else {
+                return redirect()->route('diagnostics.index');
+            }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
         }
@@ -69,9 +85,12 @@ class DiagnosticController extends Controller
      * @param  \App\Diagnostic  $diagnostic
      * @return \Illuminate\Http\Response
      */
-    public function edit(Diagnostic $diagnostic)
+    public function edit($diagnostic)
     {
-        //
+        $varGeneral = Diagnostic::find($diagnostic);
+        $labelGeneral = 'Diagnóstico';
+        $model = 'diagnostics';
+        return view('configuration.general.editGeneral', compact('varGeneral', 'labelGeneral', 'model'));
     }
 
     /**
@@ -84,12 +103,18 @@ class DiagnosticController extends Controller
     public function update(Request $request, $diagnostic)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+                'name' => 'required'
+            ]);
             $diagnostic = Diagnostic::find($diagnostic);
             if($diagnostic) {
                 $diagnostic->name = $data['name'];
                 $diagnostic->save();
-                return response()->json($diagnostic, 201);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json($diagnostic, 201);
+                } else {
+                    return redirect()->route('diagnostics.index');
+                }
             } else {
                 return response()->json(['error' => 'diagnóstico no existente'], 406);
             }
@@ -109,16 +134,21 @@ class DiagnosticController extends Controller
         try {
             $diagnosticLocated = Diagnostic::find($diagnostic);
             if($diagnosticLocated) {
-                $medicalDiagnostics = MedicalDiagnostic::where('diagnostic_id', $diagnostic)->get();
-                if ($medicalDiagnostics->isNotEmpty()) {
+                $diseases = Disease::where('diagnostic_id', $diagnostic)->get();
+                if ($diseases->isNotEmpty()) {
                     $animalRFID = array();
-                    foreach ($medicalDiagnostics as $medicalDiagnostic) {
-                        $animalRFID[] = $medicalDiagnostic->id;
+                    foreach ($diseases as $disease) {
+                        $disease->animal;
+                        $animalRFID[] = $disease->animal->animal_rfid;
                     }
                     return response()->json(['conflicto' => $animalRFID], 409);
                 } else {
                     $diagnosticLocated->delete();
-                    return response()->json(['exitoso' => 'Diagnóstico: ' . $diagnosticLocated->name . ' eliminado con éxito'], 204);
+                    if (request()->header('Content-Type') == 'application/json') {
+                        return response()->json(['exitoso' => 'Diagnóstico: ' . $diagnosticLocated->name . ' eliminado con éxito'], 204);
+                    } else {
+                        return redirect()->route('diagnostics.index');
+                    }
                 }
             } else {
                 return response()->json(['error' => 'Diagnóstico no existente'], 406);

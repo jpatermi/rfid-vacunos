@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\AgeGroup;
 use Illuminate\Http\Request;
+use App\Animal;
 
 class AgeGroupController extends Controller
 {
@@ -15,8 +16,15 @@ class AgeGroupController extends Controller
     public function index()
     {
         $ageGroups = AgeGroup::all()->sortBy('id')->values();
-        return response()->json($ageGroups, 200);
-    }
+        if (request()->header('Content-Type') == 'application/json') {
+            return response()->json($ageGroups, 200);
+        } else {
+            $varGenerals = $ageGroups;
+            $labelGeneral = 'Grupo Etario';
+            $model = 'agegroups';
+            return view('configuration.general.indexGeneral', compact('varGenerals', 'labelGeneral', 'model'));
+        }
+}
 
     /**
      * Show the form for creating a new resource.
@@ -25,7 +33,9 @@ class AgeGroupController extends Controller
      */
     public function create()
     {
-        //
+        $labelGeneral = 'Grupo Etario';
+        $model = 'agegroups';
+        return view('configuration.general.createGeneral', compact('labelGeneral', 'model'));
     }
 
     /**
@@ -37,11 +47,17 @@ class AgeGroupController extends Controller
     public function store(Request $request)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+                'name' => 'required'
+            ]);
             $ageGroup = AgeGroup::create([
               'name' => $data['name']
             ]);
-            return response()->json($ageGroup, 201);
+            if (request()->header('Content-Type') == 'application/json') {
+                return response()->json($ageGroup, 201);
+            } else {
+                return redirect()->route('agegroups.index');
+            }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
         }
@@ -69,9 +85,12 @@ class AgeGroupController extends Controller
      * @param  \App\AgeGroup  $ageGroup
      * @return \Illuminate\Http\Response
      */
-    public function edit(AgeGroup $ageGroup)
+    public function edit($ageGroup)
     {
-        //
+        $varGeneral = AgeGroup::find($ageGroup);
+        $labelGeneral = 'Grupo Etario';
+        $model = 'agegroups';
+        return view('configuration.general.editGeneral', compact('varGeneral', 'labelGeneral', 'model'));
     }
 
     /**
@@ -84,12 +103,18 @@ class AgeGroupController extends Controller
     public function update(Request $request, $ageGroup)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+                'name' => 'required'
+            ]);
             $ageGroup = AgeGroup::find($ageGroup);
             if($ageGroup) {
                 $ageGroup->name = $data['name'];
                 $ageGroup->save();
-                return response()->json($ageGroup, 201);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json($ageGroup, 201);
+                } else {
+                    return redirect()->route('agegroups.index');
+                }
             } else {
                 return response()->json(['error' => 'Grupo Etario no existente'], 406);
             }
@@ -118,7 +143,11 @@ class AgeGroupController extends Controller
                     return response()->json(['conflicto' => $animalRFID], 409);
                 } else {
                     $ageGroupLocated->delete();
-                    return response()->json(['exitoso' => 'Grupo Etario: ' . $ageGroupLocated->name . ' eliminado con éxito'], 204);
+                    if (request()->header('Content-Type') == 'application/json') {
+                        return response()->json(['exitoso' => 'Grupo Etario: ' . $ageGroupLocated->name . ' eliminado con éxito'], 204);
+                    } else {
+                        return redirect()->route('agegroups.index');
+                    }
                 }
             } else {
                 return response()->json(['error' => 'Grupo Etario no existente'], 406);

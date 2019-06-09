@@ -43,14 +43,14 @@ class Disease extends Model
     	'deleted_at',
     ];
     /**
-     * Get the comments for the farm.
+     * Get the comments for the animal.
     */
     public function animal()
     {
         return $this->belongsTo('App\Animal');
     }
     /**
-     * Get the comments for the farm.
+     * Get the comments for the veterinarian.
     */
     public function veterinarian()
     {

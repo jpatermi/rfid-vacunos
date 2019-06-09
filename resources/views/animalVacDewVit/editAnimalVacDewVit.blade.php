@@ -61,16 +61,3 @@
     </div>
   </div>
 </div>
-
-@section('script_fecha_edit')
-    <script>
-        $("#dateFaceEdit").change(function(event) {
-          $( "#applicationDateEdit" ).attr("value", convertDateFormatVZLA_to_USA(`${dateFaceEdit.value}`));
-        });
-
-        function convertDateFormatVZLA_to_USA(string) {
-          var info = string.split('/');
-          return info[2] + '-' + info[1] + '-' + info[0];
-        };
-    </script>
-@endsection

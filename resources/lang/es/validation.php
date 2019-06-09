@@ -191,6 +191,10 @@ return [
         'user_id'               => 'Usuario',
         'vaccination_id'        => 'Vacuna',
         'dose'                  => 'Dosis',
-        'application_date'      => 'fecha de aplicación'
+        'application_date'      => 'fecha de aplicación',
+        'characteristic'        => 'Característica',
+        'production_date'       => 'fecha de producción',
+        'colostrum'             => 'Calostro',
+        'milk'                  => 'Leche'
     ],
 ];

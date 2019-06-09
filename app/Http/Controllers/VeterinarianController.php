@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Veterinarian;
 use Illuminate\Http\Request;
+use App\Disease;
 
 class VeterinarianController extends Controller
 {
@@ -15,7 +16,14 @@ class VeterinarianController extends Controller
     public function index()
     {
         $veterinarians = Veterinarian::all()->sortBy('name')->values();
-        return response()->json($veterinarians, 200);
+        if (request()->header('Content-Type') == 'application/json') {
+            return response()->json($veterinarians, 200);
+        } else {
+            $varGenerals = $veterinarians;
+            $labelGeneral = 'Veterinario';
+            $model = 'veterinarians';
+            return view('configuration.general.indexGeneral', compact('varGenerals', 'labelGeneral', 'model'));
+        }
     }
 
     /**
@@ -25,7 +33,9 @@ class VeterinarianController extends Controller
      */
     public function create()
     {
-        //
+        $labelGeneral = 'Veterinario';
+        $model = 'veterinarians';
+        return view('configuration.general.createGeneral', compact('labelGeneral', 'model'));
     }
 
     /**
@@ -37,11 +47,17 @@ class VeterinarianController extends Controller
     public function store(Request $request)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+                'name' => 'required'
+            ]);
             $veterinarian = Veterinarian::create([
               'name' => $data['name']
             ]);
-            return response()->json($veterinarian, 201);
+            if (request()->header('Content-Type') == 'application/json') {
+                return response()->json($veterinarian, 201);
+            } else {
+                return redirect()->route('veterinarians.index');
+            }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
         }
@@ -69,9 +85,12 @@ class VeterinarianController extends Controller
      * @param  \App\Veterinarian  $veterinarian
      * @return \Illuminate\Http\Response
      */
-    public function edit(Veterinarian $veterinarian)
+    public function edit($veterinarian)
     {
-        //
+        $varGeneral = Veterinarian::find($veterinarian);
+        $labelGeneral = 'Veterinario';
+        $model = 'veterinarians';
+        return view('configuration.general.editGeneral', compact('varGeneral', 'labelGeneral', 'model'));
     }
 
     /**
@@ -84,12 +103,18 @@ class VeterinarianController extends Controller
     public function update(Request $request, $veterinarian)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+                'name' => 'required'
+            ]);
             $veterinarian = Veterinarian::find($veterinarian);
             if($veterinarian) {
                 $veterinarian->name = $data['name'];
                 $veterinarian->save();
-                return response()->json($veterinarian, 201);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json($veterinarian, 201);
+                } else {
+                    return redirect()->route('veterinarians.index');
+                }
             } else {
                 return response()->json(['error' => 'Veterinario no existente'], 406);
             }
@@ -109,16 +134,20 @@ class VeterinarianController extends Controller
         try {
             $veterinarianLocated = Veterinarian::find($veterinarian);
             if($veterinarianLocated) {
-                $medicalDiagnostics = MedicalDiagnostic::where('veterinarian_id', $veterinarian)->get();
-                if ($medicalDiagnostics->isNotEmpty()) {
+                $diseases = Disease::where('veterinarian_id', $veterinarian)->get();
+                if ($diseases->isNotEmpty()) {
                     $animalRFID = array();
-                    foreach ($medicalDiagnostics as $medicalDiagnostic) {
-                        $animalRFID[] = $medicalDiagnostic->id;
+                    foreach ($diseases as $disease) {
+                        $animalRFID[] = $disease->animal->animal_rfid;
                     }
                     return response()->json(['conflicto' => $animalRFID], 409);
                 } else {
                     $veterinarianLocated->delete();
-                    return response()->json(['exitoso' => 'Veterinario: ' . $veterinarianLocated->name . ' eliminado con éxito'], 204);
+                    if (request()->header('Content-Type') == 'application/json') {
+                        return response()->json(['exitoso' => 'Veterinario: ' . $veterinarianLocated->name . ' eliminado con éxito'], 204);
+                    } else {
+                        return redirect()->route('veterinarians.index');
+                    }
                 }
             } else {
                 return response()->json(['error' => 'Veterinario no existente'], 406);

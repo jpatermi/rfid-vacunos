@@ -1,4 +1,4 @@
-@extends('template')
+@extends('layouts.app')
 @section('content')
 	<div class="card">
 		<h4 class="card-header font-weight-bold text-center">Agregar Animal</h4>
@@ -142,7 +142,7 @@
 		</div>
 	</div>
 @endsection
-@section('script_area_lct1_lct2')
+@section('scripts')
     <script>
 		$.when( $.ready ).then(function() {
   			$( "#area" ).trigger( "change" );

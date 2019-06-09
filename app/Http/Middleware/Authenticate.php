@@ -30,14 +30,18 @@ class Authenticate //extends Middleware
      */
     public function handle($request, Closure $next)
     {
-        if ($request->header('Authorization')) {
-            if (User::where('api_token', $request->header('Authorization'))->first()){
-                return $next($request);
+        if (request()->header('Content-Type') == 'application/json') {
+            if ($request->header('Authorization')) {
+                if (User::where('api_token', $request->header('Authorization'))->first()){
+                    return $next($request);
+                } else {
+                    return response()->json(['error' => 'No autorizado. Por favor autentícate primero (token).'], 401);
+                }
             } else {
-                return response()->json(['error' => 'No autorizado. Por favor autentícate primero (token).'], 401);
+                return response()->json(['error' => 'No autorizado. Por favor autentícate primero (header).'], 401);
             }
         } else {
-            return response()->json(['error' => 'No autorizado. Por favor autentícate primero (header).'], 401);
+            return $next($request);
         }
     }
 }

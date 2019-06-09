@@ -15,7 +15,14 @@ class VitaminController extends Controller
     public function index()
     {
         $vitamin = Vitamin::all()->sortBy('name')->values();
-        return response()->json($vitamin, 200);
+        if (request()->header('Content-Type') == 'application/json') {
+            return response()->json($vitamin, 200);
+        } else {
+            $varVacDewVits = $vitamin;
+            $labelVacDewVit = 'Vitamina';
+            $model = 'vitamins';
+            return view('configuration.VacDewVit.indexVacDewVit', compact('varVacDewVits', 'labelVacDewVit', 'model'));
+        }
     }
 
     /**
@@ -25,7 +32,9 @@ class VitaminController extends Controller
      */
     public function create()
     {
-        //
+        $labelVacDewVit = 'Vitamina';
+        $model = 'vitamins';
+        return view('configuration.VacDewVit.createVacDewVit', compact('labelVacDewVit', 'model'));
     }
 
     /**
@@ -37,12 +46,19 @@ class VitaminController extends Controller
     public function store(Request $request)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+              'name' => 'required',
+              'characteristic' => 'required',
+            ]);
             $vitamin = Vitamin::create([
               'name' => $data['name'],
               'characteristic' => $data['characteristic'],
             ]);
-            return response()->json($vitamin, 201);
+            if (request()->header('Content-Type') == 'application/json') {
+                return response()->json($vitamin, 201);
+            } else {
+                return redirect()->route('vitamins.index');
+            }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
         }
@@ -72,7 +88,10 @@ class VitaminController extends Controller
      */
     public function edit(Vitamin $vitamin)
     {
-        //
+        $varVacDewVit = Vitamin::find($vitamin->id);
+        $labelVacDewVit = 'Vitamina';
+        $model = 'vitamins';
+        return view('configuration.VacDewVit.editVacDewVit', compact('varVacDewVit', 'labelVacDewVit', 'model'));
     }
 
     /**
@@ -85,13 +104,20 @@ class VitaminController extends Controller
     public function update(Request $request, $vitamin)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+              'name' => 'required',
+              'characteristic' => 'required',
+            ]);
             $vitamin = Vitamin::find($vitamin);
             if($vitamin) {
                 $vitamin->name = $data['name'];
                 $vitamin->characteristic = $data['characteristic'];
                 $vitamin->save();
-                return response()->json($vitamin, 201);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json($vitamin, 201);
+                } else {
+                    return redirect()->route('vitamins.index');
+                }
             } else {
                 return response()->json(['error' => 'Vitamina no existente'], 406);
             }
@@ -120,7 +146,11 @@ class VitaminController extends Controller
                     return response()->json(['conflicto' => $animalRFID], 409);
                 } else {
                     $vitamin->delete();
-                    return response()->json(['exitoso' => 'Vitamina: ' . $vitamin->name . ' eliminada con éxito'], 204);
+                    if (request()->header('Content-Type') == 'application/json') {
+                        return response()->json(['exitoso' => 'Vitamina: ' . $vitamin->name . ' eliminada con éxito'], 204);
+                    } else {
+                        return redirect()->route('vitamins.index');
+                    }
                 }
             } else {
                 return response()->json(['error' => 'Vitamina no existente'], 406);

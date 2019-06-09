@@ -15,7 +15,14 @@ class TreatmentController extends Controller
     public function index()
     {
         $treatments = Treatment::all()->sortBy('name')->values();
-        return response()->json($treatments, 200);
+        if (request()->header('Content-Type') == 'application/json') {
+            return response()->json($treatments, 200);
+        } else {
+            $varGenerals = $treatments;
+            $labelGeneral = 'Tratamiento';
+            $model = 'treatments';
+            return view('configuration.general.indexGeneral', compact('varGenerals', 'labelGeneral', 'model'));
+        }
     }
 
     /**
@@ -25,7 +32,9 @@ class TreatmentController extends Controller
      */
     public function create()
     {
-        //
+        $labelGeneral = 'Tratamiento';
+        $model = 'treatments';
+        return view('configuration.general.createGeneral', compact('labelGeneral', 'model'));
     }
 
     /**
@@ -37,11 +46,17 @@ class TreatmentController extends Controller
     public function store(Request $request)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+                'name' => 'required'
+            ]);
             $treatment = Treatment::create([
               'name' => $data['name']
             ]);
-            return response()->json($treatment, 201);
+            if (request()->header('Content-Type') == 'application/json') {
+                return response()->json($treatment, 201);
+            } else {
+                return redirect()->route('treatments.index');
+            }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
         }
@@ -69,9 +84,12 @@ class TreatmentController extends Controller
      * @param  \App\Treatment  $treatment
      * @return \Illuminate\Http\Response
      */
-    public function edit(Treatment $treatment)
+    public function edit($treatment)
     {
-        //
+        $varGeneral = Treatment::find($treatment);
+        $labelGeneral = 'Tratamiento';
+        $model = 'treatments';
+        return view('configuration.general.editGeneral', compact('varGeneral', 'labelGeneral', 'model'));
     }
 
     /**
@@ -84,12 +102,18 @@ class TreatmentController extends Controller
     public function update(Request $request, $treatment)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+                'name' => 'required'
+            ]);
             $treatment = Treatment::find($treatment);
             if($treatment) {
                 $treatment->name = $data['name'];
                 $treatment->save();
-                return response()->json($treatment, 201);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json($treatment, 201);
+                } else {
+                    return redirect()->route('treatments.index');
+                }
             } else {
                 return response()->json(['error' => 'Tratamiento no existente'], 406);
             }
@@ -109,16 +133,20 @@ class TreatmentController extends Controller
         try {
             $treatmentLocated = Treatment::find($treatment);
             if($treatmentLocated) {
-                $medicalDiagnostics = MedicalDiagnostic::where('treatment_id', $treatment)->get();
-                if ($medicalDiagnostics->isNotEmpty()) {
+                $diseases = $treatmentLocated->diseases;
+                if ($diseases->isNotEmpty()) {
                     $animalRFID = array();
-                    foreach ($medicalDiagnostics as $medicalDiagnostic) {
-                        $animalRFID[] = $medicalDiagnostic->id;
+                    foreach ($diseases as $disease) {
+                        $animalRFID[] = $disease->pivot->disease->animal->animal_rfid;
                     }
                     return response()->json(['conflicto' => $animalRFID], 409);
                 } else {
                     $treatmentLocated->delete();
-                    return response()->json(['exitoso' => 'Tratamiento: ' . $treatmentLocated->name . ' eliminado con éxito'], 204);
+                    if (request()->header('Content-Type') == 'application/json') {
+                        return response()->json(['exitoso' => 'Tratamiento: ' . $treatmentLocated->name . ' eliminado con éxito'], 204);
+                    } else {
+                        return redirect()->route('treatments.index');
+                    }
                 }
             } else {
                 return response()->json(['error' => 'Tratamiento no existente'], 406);

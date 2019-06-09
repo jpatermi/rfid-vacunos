@@ -149,7 +149,18 @@ class AnimalController extends Controller
         $animal = Animal::where('animal_rfid', $animal_rfid)->get()->first();
         if ($animal) {
             $animal->physicalCharacteristics;
-            return response()->json($animal, 200);
+            if (request()->header('Content-Type') == 'application/json') {
+                return response()->json($animal, 200);
+            } else {
+                $animal->breed;
+                $animal->area;
+                $animal->lct1;
+                $animal->lct2;
+                $animal->agegroup;
+                $animal->physicalCharacteristics;
+                $i=0;
+                return view('animals.showAnimal', compact('animal', 'i'));
+            }
         } else {
             return response()->json(['error' => 'Animal ' . $animal_rfid . ' no existente'], 406);
         }

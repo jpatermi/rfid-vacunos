@@ -1,4 +1,4 @@
-@extends('template')
+@extends('layouts.app')
 
 @section('content')
     <div class="card">
@@ -98,8 +98,8 @@
               <input type="button" class="btn btn-primary mt-2 ml-1" id="btn_add" value="Agregar">
             </div>
           </div>
-          <table class="table table-striped table-border table-condensed table-hover" id="table_tratamiento">
-            <thead>
+          <table class="table table-striped table-hover" id="table_tratamiento">
+            <thead class="thead-dark">
               <th>Tratamiento</th>
               <th>Indicación</th>
               <th>Acción</th>
@@ -122,7 +122,7 @@
       </div>
     </div>
 @endsection
-@section('script_area_lct1_lct2')
+@section('scripts')
     <script>
         $("#dateface").change(function(event) {
           $( "#review_date" ).attr("value", convertDateFormatVZLA_to_USA(`${dateface.value}`));
@@ -147,13 +147,13 @@
           indicacion = $("#pindicacion").val();
 
           if (indicacion != "") {
-            var fila = '<tr class="selected" id="fila' + cont +'"><td><input type="hidden" name="treatment_id[]" value="'+idTratamiento+'">'+tratamiento+'</td><td><input type="text" name="indication[]" value="'+indicacion+'"></td><td><button type="button" class="btn btn-danger" onclick="eliminar('+cont+')">X</button></td></tr>';
+            var fila = '<tr id="fila' + cont +'"><td><input type="hidden" name="treatment_id[]" value="'+idTratamiento+'">'+tratamiento+'</td><td><input type="hidden" name="indication[]" value="'+indicacion+'">'+indicacion+'</td><td><button type="button" class="btn btn-danger" onclick="eliminar('+cont+')">X</button></td></tr>';
             cont++;
             limpiar();
             $("#table_tratamiento").append(fila);
           }
           else {
-            alert("Error");
+            alert("La indicación es obligatoria");
           }
         }
 

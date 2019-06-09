@@ -1,4 +1,4 @@
-@extends('template')
+@extends('layouts.app')
 
 @section('content')
     <div class="card">
@@ -15,7 +15,7 @@
                 <tr>
                   <th scope="col">RFID</th>
                   <th scope="col">Género</th>
-                  <th scope="col">Raza</th>
+                  {{--<th scope="col">Raza</th>--}}
                   <th scope="col">Acciones</th>
                 </tr>
               </thead>
@@ -28,31 +28,19 @@
                   @else
                       <td>Hembra</td>
                   @endif
-                  <td>{{ $animal->breed->name }}</td>
+                  {{--<td>{{ $animal->breed->name }}</td>--}}
                   <td>
                       <form action="{{ route('animals.destroy', $animal) }}" method="POST">
                           {{ method_field('DELETE') }}
                           @csrf
                           <a href="{{ route('animals.show', $animal->animal_rfid) }}" class="btn btn-link text-primary">
-                              <span class="material-icons">visibility</span>
+                              <span data-toggle="tooltip" data-placement="top" title="Ver Animal"><img class="" src="{{ asset('img/ico/baseline-visibility-24px.svg') }}" alt="Ver"></span>
                           </a>
                           <a href="{{ route('animals.edit', $animal) }}" class="btn btn-link text-primary">
-                              <span class="material-icons">edit</span>
-                          </a>
-                          <a href="{{ route('animalvaccination.show', $animal) }}" class="btn btn-link text-primary">
-                              <span class="material-icons">bug_report</span>
-                          </a>
-                          <a href="{{ route('animaldewormer.show', $animal) }}" class="btn btn-link text-primary">
-                              <span class="material-icons">gavel</span>
-                          </a>
-                          <a href="{{ route('animalvitamin.show', $animal) }}" class="btn btn-link text-primary">
-                              <span class="material-icons">card_travel</span>
-                          </a>
-                          <a href="{{ route('disease.GetAnimalDiseases', $animal) }}" class="btn btn-link text-primary">
-                              <span class="material-icons">alarm</span>
+                              <span data-toggle="tooltip" data-placement="top" title="Editar Animal" ><img class="" src="{{ asset('img/ico/baseline-edit-24px.svg') }}" alt="Editar"></span>
                           </a>
                           <button type="submit" class="btn btn-link text-primary">
-                              <span class="material-icons">delete</span>
+                              <span data-toggle="tooltip" data-placement="top" title="Eliminar Animal"><img class="" src="{{ asset('img/ico/baseline-delete-24px.svg') }}" alt="Eliminar"></span>
                           </button>
                       </form>
                   </td>

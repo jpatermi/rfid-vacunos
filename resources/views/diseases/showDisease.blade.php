@@ -1,4 +1,4 @@
-@extends('template')
+@extends('layouts.app')
 
 @section('content')
     <div class="card">
@@ -9,7 +9,7 @@
             </h3>
             <div>
               <a class="btn btn-primary mb-2" href="{{ route('diseases.create', 'animal_id = ' . $animal->id) }}">Agregar Enfermedad</a>
-              <a href="{{ route('animals.index') }}" class="btn-link btn pb-3">Regresar al listado de Animales</a>
+              <a href="{{ route('animals.show', $animal->animal_rfid) }}" class="btn-link btn pb-3">Regresar al Detalle</a>
             </div>
         </div>
       </div>
@@ -26,17 +26,17 @@
               <tbody>
               @foreach ($animalDiseases as $animalDisease)
               <tr>
-                  <th>{{ $animalDisease['diagnostic_name'] }}</th>
-                  <th>{{ $animalDisease['review_date'] }}</th>
+                  <td>{{ $animalDisease['diagnostic_name'] }}</td>
+                  <td>{{ $animalDisease['review_date'] }}</td>
                   <td>
                       <form action="{{ route('diseases.destroy', $animalDisease['id']) }}" method="POST">
                           {{ method_field('DELETE') }}
                           @csrf
                           <a href="{{ route('diseases.edit', $animalDisease['id']) }}" class="btn btn-link text-primary">
-                              <span class="material-icons">edit</span>
+                              <span data-toggle="tooltip" data-placement="top" title="Editar Enfermedad" ><img class="" src="{{ asset('img/ico/baseline-edit-24px.svg') }}" alt="Editar"></span>
                           </a>
                           <button type="submit" class="btn btn-link text-primary" onclick="return confirm('¿Esta seguro de eliminar la Enfermedad: {{ $animalDisease['diagnostic_name'] }}?')">
-                              <span class="material-icons">delete</span>
+                              <span data-toggle="tooltip" data-placement="top" title="Eliminar Enfermedad"><img class="" src="{{ asset('img/ico/baseline-delete-24px.svg') }}" alt="Eliminar"></span>
                           </button>
                       </form>
                   </td>
@@ -49,7 +49,7 @@
         @endif
       </div>
       <div class="card-footer">
-        <a href="{{ route('animals.index') }}" class="btn-link btn">Regresar al listado de Animales</a>
+        <a href="{{ route('animals.show', $animal->animal_rfid) }}" class="btn-link btn">Regresar al Detalle</a>
       </div>
     </div>
 @endsection

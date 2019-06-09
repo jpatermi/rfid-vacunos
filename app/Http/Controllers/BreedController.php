@@ -19,7 +19,10 @@ class BreedController extends Controller
         if (request()->header('Content-Type') == 'application/json') {
             return response()->json($breeds, 200);
         } else {
-            return view('/breeds/indexBreed', compact('breeds'));
+            $varGenerals = $breeds;
+            $labelGeneral = 'Raza';
+            $model = 'breeds';
+            return view('configuration.general.indexGeneral', compact('varGenerals', 'labelGeneral', 'model'));
         }
     }
 
@@ -30,7 +33,9 @@ class BreedController extends Controller
      */
     public function create()
     {
-        return view('breeds.createBreed');
+        $labelGeneral = 'Raza';
+        $model = 'breeds';
+        return view('configuration.general.createGeneral', compact('labelGeneral', 'model'));
     }
 
     /**
@@ -86,7 +91,7 @@ class BreedController extends Controller
         }
         else
         {
-            return view('/breeds/showBreed', compact('breed'));
+            return view('configuration.general.showGeneral', compact('breed'));
         }
 }
 
@@ -99,7 +104,10 @@ class BreedController extends Controller
     public function edit(Breed $breed)
     {
         //$breed = Breed::find($breed);
-        return view('breeds.editBreed', ['breed' => $breed]);
+        $varGeneral = $breed;
+        $labelGeneral = 'Raza';
+        $model = 'breeds';
+        return view('configuration.general.editGeneral', compact('varGeneral', 'labelGeneral', 'model'));
     }
 
     /**

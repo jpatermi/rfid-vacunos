@@ -15,7 +15,14 @@ class VaccinationController extends Controller
     public function index()
     {
         $vaccination = Vaccination::all()->sortBy('name')->values();
-        return response()->json($vaccination, 200);
+        if (request()->header('Content-Type') == 'application/json') {
+            return response()->json($vaccination, 200);
+        } else {
+            $varVacDewVits = $vaccination;
+            $labelVacDewVit = 'Vacuna';
+            $model = 'vaccinations';
+            return view('configuration.VacDewVit.indexVacDewVit', compact('varVacDewVits', 'labelVacDewVit', 'model'));
+        }
     }
 
     /**
@@ -25,7 +32,9 @@ class VaccinationController extends Controller
      */
     public function create()
     {
-        //
+        $labelVacDewVit = 'Vacuna';
+        $model = 'vaccinations';
+        return view('configuration.VacDewVit.createVacDewVit', compact('labelVacDewVit', 'model'));
     }
 
     /**
@@ -37,12 +46,19 @@ class VaccinationController extends Controller
     public function store(Request $request)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+              'name' => 'required',
+              'characteristic' => 'required',
+            ]);
             $vaccination = Vaccination::create([
               'name' => $data['name'],
               'characteristic' => $data['characteristic'],
             ]);
-            return response()->json($vaccination, 201);
+            if (request()->header('Content-Type') == 'application/json') {
+                return response()->json($vaccination, 201);
+            } else {
+                return redirect()->route('vaccinations.index');
+            }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
         }
@@ -72,7 +88,10 @@ class VaccinationController extends Controller
      */
     public function edit(Vaccination $vaccination)
     {
-        //
+        $varVacDewVit = Vaccination::find($vaccination->id);
+        $labelVacDewVit = 'Vacuna';
+        $model = 'vaccinations';
+        return view('configuration.VacDewVit.editVacDewVit', compact('varVacDewVit', 'labelVacDewVit', 'model'));
     }
 
     /**
@@ -85,13 +104,20 @@ class VaccinationController extends Controller
     public function update(Request $request, $vaccination)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+              'name' => 'required',
+              'characteristic' => 'required',
+            ]);
             $vaccination = Vaccination::find($vaccination);
             if($vaccination) {
                 $vaccination->name = $data['name'];
                 $vaccination->characteristic = $data['characteristic'];
                 $vaccination->save();
-                return response()->json($vaccination, 201);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json($vaccination, 201);
+                } else {
+                    return redirect()->route('vaccinations.index');
+                }
             } else {
                 return response()->json(['error' => 'Vacuna no existente'], 406);
             }
@@ -112,15 +138,19 @@ class VaccinationController extends Controller
             $vaccination = Vaccination::find($vaccination);
             if($vaccination) {
                 $animalVaccinations = $vaccination->animalVaccinations;
-                if ($animals->isNotEmpty()) {
+                if ($animalVaccinations->isNotEmpty()) {
                     $animalRFID = array();
-                    foreach ($animals as $animal) {
+                    foreach ($animalVaccinations as $animal) {
                         $animalRFID[] = $animal->animal_rfid;
                     }
                     return response()->json(['conflicto' => $animalRFID], 409);
                 } else {
                     $vaccination->delete();
-                    return response()->json(['exitoso' => 'Vacuna: ' . $vaccination->name . ' eliminada con éxito'], 204);
+                    if (request()->header('Content-Type') == 'application/json') {
+                        return response()->json(['exitoso' => 'Vacuna: ' . $vaccination->name . ' eliminada con éxito'], 204);
+                    } else {
+                        return redirect()->route('vaccinations.index');
+                    }
                 }
             } else {
                 return response()->json(['error' => 'Vacuna no existente'], 406);
