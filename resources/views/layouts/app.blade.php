@@ -54,7 +54,18 @@
                             @endif--}}
                         @else
                             <a class="nav-item nav-link active" href="{{ route('animals.index') }}">Registro de Animales</a>
-                            <a class="nav-item nav-link active" href="#">Reportes</a>
+                            <li class="nav-item dropdown active">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                  Reportes
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <a class="dropdown-item" href="{{ route('animals.totalanimalsareas') }}">Inventario</a>
+                                    <a class="dropdown-item" href="{{ route('vaccinations.totalAnimalVaccinations') }}">Vacunaciones</a>
+                                    <a class="dropdown-item" href="{{ route('dewormers.totalAnimalDewormers') }}">Desparasitaciones</a>
+                                    <a class="dropdown-item" href="{{ route('vitamins.totalAnimalVitamins') }}">Vitaminas</a>
+                                    <a class="dropdown-item" href="{{ route('agegroups.totalAnimalsAgeGroups') }}">Grupos Etarios</a>
+                                </div>
+                            </li>
                             <li class="nav-item dropdown active">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                   Configuración

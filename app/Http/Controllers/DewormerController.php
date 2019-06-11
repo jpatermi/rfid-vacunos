@@ -169,16 +169,37 @@ class DewormerController extends Controller
         /*** Con este me traigo el total de Animales por Razas ****/
         $dewormers = \App\Dewormer::all();
         $totalDewormers = array();
-        foreach ($dewormers as $dewormer)
-        {
-            $name   = $dewormer->name;
-            $totalDewormers[] = $name;
-            $animals = $dewormer->animalDewormers;
-            foreach ($animals as $animal)
+        if (request()->header('Content-Type') == 'application/json') {
+            foreach ($dewormers as $dewormer)
             {
-                $totalDewormers[] = "\t\t" . $animal->animal_rfid . "\t\t\t\t\t\t\t\t" . $animal->pivot->application_date->format('d/m/Y');
+                $name   = $dewormer->name;
+                $totalDewormers[] = $name;
+                $animals = $dewormer->animalDewormers;
+                foreach ($animals as $animal)
+                {
+                    $totalDewormers[] = "\t\t" . $animal->animal_rfid . "\t\t\t\t\t\t\t\t" . $animal->pivot->application_date->format('d/m/Y');
+                }
             }
+            return response()->json(['totals' => $totalDewormers], 200);
+        } else {
+            foreach ($dewormers as $dewormer)
+            {
+                $arrNivelCero = array('nivel'            => 1,
+                                      'vaccOrfid'        => $dewormer->name,
+                                      'application_date' => null);
+                $totalDewormers[] = $arrNivelCero;
+                $animals = $dewormer->animalDewormers;
+                foreach ($animals as $animal)
+                {
+                    $arrNivelUno = array('nivel'            => 4,
+                                         'vaccOrfid'        => $animal->animal_rfid,
+                                         'application_date' => $animal->pivot->application_date->format('d/m/Y'));
+                    $totalDewormers[] = $arrNivelUno;
+                }
+            }
+            $totalGenerals = $totalDewormers;
+            $labelVacDewVit = 'Desparasitantes';
+            return view('report.general.totalAnimalsGeneral', compact('totalGenerals', 'labelVacDewVit'));
         }
-        return response()->json(['totals' => $totalDewormers], 200);
     }
 }

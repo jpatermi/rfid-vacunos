@@ -4,20 +4,27 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Laravel</title>
+        <title>RFID-Animal</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet" type="text/css">
+
+        <!-- Icon -->
+        <link rel="icon" href="{{ asset('img/cow-256.png') }}">
 
         <!-- Styles -->
         <style>
             html, body {
                 background-color: #fff;
-                color: #636b6f;
+                color: #fff;
                 font-family: 'Nunito', sans-serif;
                 font-weight: 200;
                 height: 100vh;
                 margin: 0;
+                background-image: url("{{ asset('img/background/animal-4137914_1920.jpg') }}");
+                background-repeat: no-repeat;
+                background-position: center;
+                background-size: auto;
             }
 
             .full-height {
@@ -36,7 +43,7 @@
 
             .top-right {
                 position: absolute;
-                right: 10px;
+                right: 25px;
                 top: 18px;
             }
 
@@ -49,9 +56,9 @@
             }
 
             .links > a {
-                color: #636b6f;
+                color: #fff;
                 padding: 0 25px;
-                font-size: 13px;
+                font-size: 15px;
                 font-weight: 600;
                 letter-spacing: .1rem;
                 text-decoration: none;
@@ -59,7 +66,7 @@
             }
 
             .m-b-md {
-                margin-bottom: 30px;
+                margin-bottom: 175px;
             }
         </style>
     </head>

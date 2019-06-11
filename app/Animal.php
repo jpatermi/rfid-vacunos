@@ -187,4 +187,13 @@ class Animal extends Model
     {
         return $this->hasMany('App\PhysicalCharacteristic');
     }
+    /**
+     * Query Scope.
+    */
+    public function scopeRFID($query, $animal_rfid)
+    {
+        if($animal_rfid) {
+            return $query->where('animal_rfid', 'LIKE', "%$animal_rfid%");
+        }
+    }
 }

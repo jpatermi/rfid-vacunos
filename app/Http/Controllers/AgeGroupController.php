@@ -165,15 +165,19 @@ class AgeGroupController extends Controller
     {
         /*** Con este me traigo el total de Animales por Razas ****/
         $ageGroups = \App\AgeGroup::withCount('animals')->get()->where("animals_count", ">", 0);
-        $totalAgeGroup = array();
-        foreach ($ageGroups as $ageGroup) {
-            $name   = $ageGroup->name;
-            for ($x = 1; $x <= (25 - strlen($ageGroup->name)); $x++)
-            {
-                $name = $name . "\t";
+        if (request()->header('Content-Type') == 'application/json') {
+            $totalAgeGroup = array();
+            foreach ($ageGroups as $ageGroup) {
+                $name   = $ageGroup->name;
+                for ($x = 1; $x <= (25 - strlen($ageGroup->name)); $x++)
+                {
+                    $name = $name . "\t";
+                }
+                $totalAgeGroup[] = $name . $ageGroup->animals_count;
             }
-            $totalAgeGroup[] = $name . $ageGroup->animals_count;
+            return response()->json(['totals' => $totalAgeGroup], 200);
+        } else {
+            return view('report.ageGroup.totalAnimalsAgeGroups', compact('ageGroups'));
         }
-        return response()->json(['totals' => $totalAgeGroup], 200);
     }
 }

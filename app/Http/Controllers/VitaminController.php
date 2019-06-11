@@ -169,16 +169,37 @@ class VitaminController extends Controller
         /*** Con este me traigo el total de Animales por Razas ****/
         $vitamins = \App\Vitamin::all();
         $totalVitamins = array();
-        foreach ($vitamins as $vitamin)
-        {
-            $name   = $vitamin->name;
-            $totalVitamins[] = $name;
-            $animals = $vitamin->AnimalVitamins;
-            foreach ($animals as $animal)
+        if (request()->header('Content-Type') == 'application/json') {
+            foreach ($vitamins as $vitamin)
             {
-                $totalVitamins[] = "\t\t" . $animal->animal_rfid . "\t\t\t\t\t\t\t\t" . $animal->pivot->application_date->format('d/m/Y');
+                $name   = $vitamin->name;
+                $totalVitamins[] = $name;
+                $animals = $vitamin->AnimalVitamins;
+                foreach ($animals as $animal)
+                {
+                    $totalVitamins[] = "\t\t" . $animal->animal_rfid . "\t\t\t\t\t\t\t\t" . $animal->pivot->application_date->format('d/m/Y');
+                }
             }
+            return response()->json(['totals' => $totalVitamins], 200);
+        } else {
+            foreach ($vitamins as $vitamin)
+            {
+                $arrNivelCero = array('nivel'            => 1,
+                                      'vaccOrfid'        => $vitamin->name,
+                                      'application_date' => null);
+                $totalVitamins[] = $arrNivelCero;
+                $animals = $vitamin->AnimalVitamins;
+                foreach ($animals as $animal)
+                {
+                    $arrNivelUno = array('nivel'            => 4,
+                                         'vaccOrfid'        => $animal->animal_rfid,
+                                         'application_date' => $animal->pivot->application_date->format('d/m/Y'));
+                    $totalVitamins[] = $arrNivelUno;
+                }
+            }
+            $totalGenerals = $totalVitamins;
+            $labelVacDewVit = 'Vitaminas';
+            return view('report.general.totalAnimalsGeneral', compact('totalGenerals', 'labelVacDewVit'));
         }
-        return response()->json(['totals' => $totalVitamins], 200);
     }
 }

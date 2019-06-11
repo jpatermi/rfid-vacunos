@@ -110,7 +110,7 @@
                 <tr id="filaT{{ $treatment->id }}">
                   <td><input type="hidden" name="treatment_id[]" value="{{ $treatment->id }}">{{ $treatment->name }}</td>
                   <td><input type="hidden" name="indication[]" value="{{ $treatment->pivot->indication }}">{{ $treatment->pivot->indication }}</td>
-                  <td><button type="button" class="btn btn-danger" onclick="eliminarT({{ $treatment->id }})">X</button></td>
+                  <td><button type="button" class="btn" onclick="eliminarT({{ $treatment->id }})"><span data-toggle="tooltip" data-placement="top" title="Eliminar Tratamiento"><img src="{{ asset('img/ico/baseline-delete-24px.svg') }}" alt="Eliminar"></span></button></td>
                 </tr>
               @endforeach
             </tbody>
@@ -160,7 +160,7 @@
           indicacion = $("#pindicacion").val();
 
           if (indicacion != "") {
-            var fila = '<tr id="fila' + cont +'"><td><input type="hidden" name="treatment_id[]" value="'+idTratamiento+'">'+tratamiento+'</td><td><input type="hidden" name="indication[]" value="'+indicacion+'">'+indicacion+'</td><td><button type="button" class="btn btn-danger" onclick="eliminar('+cont+')">X</button></td></tr>';
+            var fila = '<tr id="fila' + cont +'"><td><input type="hidden" name="treatment_id[]" value="'+idTratamiento+'">'+tratamiento+'</td><td><input type="hidden" name="indication[]" value="'+indicacion+'">'+indicacion+'</td><td><button type="button" class="btn" onclick="eliminar('+cont+')"><span data-toggle="tooltip" data-placement="top" title="Eliminar Tratamiento"><img src="{{ asset('img/ico/baseline-delete-24px.svg') }}" alt="Eliminar"></span></button></td></tr>';
             cont++;
             limpiar();
             $("#table_tratamiento").append(fila);

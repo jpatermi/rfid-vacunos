@@ -515,7 +515,14 @@ class DiseaseController extends Controller
             }
             else
             {
-                return response()->json(['error' => 'el Animal ' . $animal->animal_rfid . ' no ha tenido eventos de Enfermedad aún'], 406);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json(['error' => 'el Animal ' . $animal->animal_rfid . ' no ha tenido eventos de Enfermedad aún'], 406);
+                }
+                else
+                {
+                    $animalDiseases = '';
+                    return view('diseases.showDisease', compact('animalDiseases', 'animal'));
+                }
             }
         } else {
             return response()->json(['error' => 'Animal no existente'], 406);

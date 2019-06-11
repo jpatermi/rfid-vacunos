@@ -169,16 +169,37 @@ class VaccinationController extends Controller
         /*** Con este me traigo el total de Animales por Razas ****/
         $vaccinations = \App\Vaccination::all();
         $totalVaccinations = array();
-        foreach ($vaccinations as $vaccination)
-        {
-            $name   = $vaccination->name;
-            $totalVaccinations[] = $name;
-            $animals = $vaccination->AnimalVaccinations;
-            foreach ($animals as $animal)
+        if (request()->header('Content-Type') == 'application/json') {
+            foreach ($vaccinations as $vaccination)
             {
-                $totalVaccinations[] = "\t\t" . $animal->animal_rfid . "\t\t\t\t\t\t\t\t" . $animal->pivot->application_date->format('d/m/Y');
+                $name   = $vaccination->name;
+                $totalVaccinations[] = $name;
+                $animals = $vaccination->AnimalVaccinations;
+                foreach ($animals as $animal)
+                {
+                    $totalVaccinations[] = "\t\t" . $animal->animal_rfid . "\t\t\t\t\t\t\t\t" . $animal->pivot->application_date->format('d/m/Y');
+                }
             }
+            return response()->json(['totals' => $totalVaccinations], 200);
+        } else {
+            foreach ($vaccinations as $vaccination)
+            {
+                $arrNivelCero = array('nivel'            => 1,
+                                      'vaccOrfid'        => $vaccination->name,
+                                      'application_date' => null);
+                $totalVaccinations[] = $arrNivelCero;
+                $animals = $vaccination->AnimalVaccinations;
+                foreach ($animals as $animal)
+                {
+                    $arrNivelUno = array('nivel'             => 4,
+                                         'vaccOrfid'         => $animal->animal_rfid,
+                                         'application_date'  => $animal->pivot->application_date->format('d/m/Y'));
+                    $totalVaccinations[] = $arrNivelUno;
+                }
+            }
+            $totalGenerals = $totalVaccinations;
+            $labelVacDewVit = 'Vacunas';
+            return view('report.general.totalAnimalsGeneral', compact('totalGenerals', 'labelVacDewVit'));
         }
-        return response()->json(['totals' => $totalVaccinations], 200);
     }
 }

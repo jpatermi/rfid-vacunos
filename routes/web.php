@@ -67,4 +67,13 @@ Route::group(['middleware' => ['auth.web']], function() use($router) {
 	//Route::post('/photo/{animal_rfid}', ['uses'=>'AnimalController@uploadPhoto'])->name('animals.uploadPhoto');
 
 	Route::get('/home', 'HomeController@index')->name('home')->middleware('auth.web');
+
+	//### Inventario ###
+	Route::get('/totalanimalsareas', ['uses'=>'AnimalController@totalAnimalsAreas'])->name('animals.totalanimalsareas');
+
+	// ### Reportes de Vacunas, Desparasitantes, Vutaminas y Grupos Etarios por Animal
+	Route::get('/totalanimalvaccinations', ['uses'=>'VaccinationController@totalAnimalVaccinations'])->name('vaccinations.totalAnimalVaccinations');
+	Route::get('/totalanimaldewormers', ['uses'=>'DewormerController@totalAnimalDewormers'])->name('dewormers.totalAnimalDewormers');
+	Route::get('/totalanimalvitamins', ['uses'=>'VitaminController@totalAnimalVitamins'])->name('vitamins.totalAnimalVitamins');
+	Route::get('/totalanimalagegroups', ['uses'=>'AgeGroupController@totalAnimalsAgeGroups'])->name('agegroups.totalAnimalsAgeGroups');
 });

@@ -1,0 +1,3 @@
+Crear un link símbólico para las fotos de los animales:
+Mklink /D C:\xampp\htdocs\rfid\public\storage C:\xampp\htdocs\rfid\storage\app\public
+Se debe hacer desde el símbolo del sistema (ejecutándolo en modo administrador)

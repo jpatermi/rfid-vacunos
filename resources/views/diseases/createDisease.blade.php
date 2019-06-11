@@ -95,7 +95,7 @@
             <div class="form-group justify-content-center">
               <br>
               <!--<button class="btn btn-primary mt-2 ml-1" id="btn_add">Agregar</button>-->
-              <input type="button" class="btn btn-primary mt-2 ml-1" id="btn_add" value="Agregar">
+              <input type="button" class="btn btn-primary mt-md-2 ml-md-1" id="btn_add" value="Agregar">
             </div>
           </div>
           <table class="table table-striped table-hover" id="table_tratamiento">
@@ -147,7 +147,7 @@
           indicacion = $("#pindicacion").val();
 
           if (indicacion != "") {
-            var fila = '<tr id="fila' + cont +'"><td><input type="hidden" name="treatment_id[]" value="'+idTratamiento+'">'+tratamiento+'</td><td><input type="hidden" name="indication[]" value="'+indicacion+'">'+indicacion+'</td><td><button type="button" class="btn btn-danger" onclick="eliminar('+cont+')">X</button></td></tr>';
+            var fila = '<tr id="fila' + cont +'"><td><input type="hidden" name="treatment_id[]" value="'+idTratamiento+'">'+tratamiento+'</td><td><input type="hidden" name="indication[]" value="'+indicacion+'">'+indicacion+'</td><td><button type="button" class="btn" onclick="eliminar('+cont+')"><span data-toggle="tooltip" data-placement="top" title="Eliminar Tratamiento"><img src="{{ asset('img/ico/baseline-delete-24px.svg') }}" alt="Eliminar"></span></button></td></tr>';
             cont++;
             limpiar();
             $("#table_tratamiento").append(fila);

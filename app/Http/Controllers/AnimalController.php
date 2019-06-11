@@ -14,6 +14,7 @@ use App\Area;
 use App\Lct1;
 use App\Lct2;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 
 class AnimalController extends Controller
 {
@@ -22,17 +23,21 @@ class AnimalController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $animals = Animal::all()->sortBy('animal_rfid')->values();
+        $animal_rfid = $request->get('animal_rfid');
+
+        $animals = Animal::orderBy('animal_rfid')
+            ->RFID($animal_rfid)
+            ->paginate(5);
         foreach ($animals as $animal) {
-          $animal->physicalCharacteristics;
+          //$animal->physicalCharacteristics;
           $animal->breed;
         }
         if (request()->header('Content-Type') == 'application/json') {
             return response()->json($animals, 200);
         } else {
-            return view('/animals/indexAnimal', compact('animals'));
+            return view('animals.indexAnimal', compact('animals', 'animal_rfid'));
         }
 
     }
@@ -61,7 +66,8 @@ class AnimalController extends Controller
         try {
             global $data, $animal;
             $data = $request->validate([
-                'animal_rfid'   => 'required|unique:animals|max:10|min:10', //TODO Revisar el unique (son 2 campos)
+                //'animal_rfid'   => 'required|unique:animals|max:10|min:10', //TODO Revisar el unique (son 2 campos)
+                'animal_rfid'   => 'required|max:10|min:10',
                 'gender'        => 'required|max:1',
                 'birthdate'     => 'required|date|max:10',
                 'breed_id'      => 'required',
@@ -159,6 +165,8 @@ class AnimalController extends Controller
                 $animal->agegroup;
                 $animal->physicalCharacteristics;
                 $i=0;
+                //Cache::flush();
+                //Cache::pull('photo');
                 return view('animals.showAnimal', compact('animal', 'i'));
             }
         } else {
@@ -183,6 +191,8 @@ class AnimalController extends Controller
                                           ->orderBy('id')
                                           ->get();
         $i=0;
+        //Cache::flush();
+        //Cache::pull('photo');
         return view('animals.editAnimal', compact('animal', 'ageGroups', 'areas', 'breeds', 'lct1s', 'lct2s', 'physicalCharacteristics', 'i'));
     }
 
@@ -219,6 +229,7 @@ class AnimalController extends Controller
             $animalLocated = Animal::find($animal->id);
             if($animalLocated)
             {
+                //dd($data);
                DB::transaction(function ()
                {
                     global $data, $animalLocated, $request;
@@ -260,14 +271,16 @@ class AnimalController extends Controller
                         // Se actualiza en la BD el indicador
                         $animalLocated->photo = true;
                         $animalLocated->save();
+                        Cache::flush();
+                        //Cache::pull('photo');
                     }
-                    else
-                    {
-                        if(!Storage::disk('local')->exists('/public/photo/' . $animalLocated->animal_rfid . '.jpg')) {
-                            $animalLocated->photo = false;
-                            $animalLocated->save();
-                        }
-                    }
+                    // else
+                    // {
+                    //     if(!Storage::disk('local')->exists('/public/photo/' . $animalLocated->animal_rfid . '.jpg')) {
+                    //         $animalLocated->photo = false;
+                    //         $animalLocated->save();
+                    //     }
+                    // }
                 });
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($animalLocated, 201);
@@ -292,7 +305,17 @@ class AnimalController extends Controller
      */
     public function destroy(Animal $animal)
     {
-        //
+        $animal = Animal::find($animal->id);
+        if ($animal) {
+            $animal->delete();
+            if (request()->header('Content-Type') == 'application/json') {
+                return response()->json(['exitoso' => 'Animal: ' . $animal->animal_rfid . ' eliminado con éxito'], 204);
+            } else {
+                return redirect()->route('animals.index');
+            }
+        } else {
+            return response()->json(['error' => 'Animal no existente'], 406);
+        }
     }
 
     /**
@@ -326,7 +349,7 @@ class AnimalController extends Controller
             else
             {
                 $file = file_get_contents('php://input');
-                if(file_put_contents(storage_path() . '/public/photo/' . $animal_rfid . '.jpg', $file))
+                if(file_put_contents(storage_path() . '/app/public/photo/' . $animal_rfid . '.jpg', $file))
                 {
                     $animal = Animal::where('animal_rfid', $animal_rfid)->get()->first();
                     if ($animal)
@@ -357,9 +380,13 @@ class AnimalController extends Controller
      */
     public function showPhoto($animal_rfid)
     {
-        if (!file_exists(public_path() . '/photo/' . $animal_rfid . '.jpg')) {
-            $animal_rfid = 'no_existe';
-        }
+         if (!file_exists(public_path() . '/storage/photo/' . $animal_rfid . '.jpg')) {
+             $animal_rfid = 'no_existe';
+         }
+//        $animal = Animal::where('animal_rfid', $animal_rfid)->get()->first();
+//        if(!$animal->photo) {
+//             $animal_rfid = 'no_existe';
+//        }
         $configuration = \App\Configuration::first();
         $url_photo = $configuration->url_photo;
         //dd($url_photo . "/". $animal_rfid);
@@ -386,39 +413,76 @@ class AnimalController extends Controller
         $areas = \App\Area::withCount('animals')->get()->where("animals_count", ">", 0);
         $totalAreas = array();
         global $areaId, $lct1Id;
-        foreach ($areas as $area)
+
+        if (request()->header('Content-Type') == 'application/json')
         {
-            $name   = $area->name;
-            $areaId = $area->id;
-            for ($x = 1; $x <= (25 - strlen($area->name)); $x++)
+            foreach ($areas as $area)
             {
-                $name = $name . "\t";
-            }
-            $totalAreas[] = $name . $area->animals_count;
-            /*** Al recorrer la colección de las áreas, me traigo el total de Animales por Módulo de cada área ****/
-            $lct1s = \App\Lct1::withCount(['animals' => function ($query) {global $areaId; $query->where('area_id', $areaId);}])->get()->where("animals_count", ">", 0);
-            foreach ($lct1s as $lct1)
-            {
-                $name = $lct1->name;
-                $lct1Id = $lct1->id;
-                for ($x = 1; $x <= (25 - strlen($lct1->name)); $x++)
+                $name   = $area->name;
+                $areaId = $area->id;
+                for ($x = 1; $x <= (25 - strlen($area->name)); $x++)
                 {
                     $name = $name . "\t";
                 }
-                $totalAreas[] = "\t" . $name . $lct1->animals_count;
-                /*** Al recorrer la colección de las lct1s, me traigo el total de Animales por Corral de cada Módulo ****/
-                $lct2s = \App\Lct2::withCount(['animals' => function ($query) {global $lct1Id; $query->where('lct1_id', $lct1Id);}])->get()->where("animals_count", ">", 0);
-                foreach ($lct2s as $lct2)
+                $totalAreas[] = $name . $area->animals_count;
+                /*** Al recorrer la colección de las áreas, me traigo el total de Animales por Módulo de cada área ****/
+                $lct1s = \App\Lct1::withCount(['animals' => function ($query) {global $areaId; $query->where('area_id', $areaId);}])->get()->where("animals_count", ">", 0);
+                foreach ($lct1s as $lct1)
                 {
-                    $name = $lct2->name;
-                    for ($x = 1; $x <= (25 - strlen($lct2->name)); $x++)
+                    $name = $lct1->name;
+                    $lct1Id = $lct1->id;
+                    for ($x = 1; $x <= (25 - strlen($lct1->name)); $x++)
                     {
                         $name = $name . "\t";
                     }
-                    $totalAreas[] = "\t\t" . $name . $lct2->animals_count;
+                    $totalAreas[] = "\t" . $name . $lct1->animals_count;
+                    /*** Al recorrer la colección de las lct1s, me traigo el total de Animales por Corral de cada Módulo ****/
+                    $lct2s = \App\Lct2::withCount(['animals' => function ($query) {global $lct1Id; $query->where('lct1_id', $lct1Id);}])->get()->where("animals_count", ">", 0);
+                    foreach ($lct2s as $lct2)
+                    {
+                        $name = $lct2->name;
+                        for ($x = 1; $x <= (25 - strlen($lct2->name)); $x++)
+                        {
+                            $name = $name . "\t";
+                        }
+                        $totalAreas[] = "\t\t" . $name . $lct2->animals_count;
+                    }
                 }
             }
+            return response()->json(['totals' => $totalAreas], 200);
         }
-        return response()->json(['totals' => $totalAreas], 200);
+        else
+        {
+            foreach ($areas as $area)
+            {
+                $arrNivelUno = array('nivel'        => 1,
+                                     'areaLct1Lct2' => $area->name,
+                                     'cantidad'     => $area->animals_count);
+                $areaId = $area->id;
+                $totalAreas[] = $arrNivelUno;
+                /*** Al recorrer la colección de las áreas, me traigo el total de Animales por Módulo de cada área ****/
+                $lct1s = \App\Lct1::withCount(['animals' => function ($query) {global $areaId; $query->where('area_id', $areaId);}])->get()->where("animals_count", ">", 0);
+                foreach ($lct1s as $lct1)
+                {
+                    $arrNivelUno = array('nivel'        => 3,
+                                         'areaLct1Lct2' => $lct1->name,
+                                         'cantidad'     => $lct1->animals_count);
+                    $lct1Id = $lct1->id;
+                    $totalAreas[] = $arrNivelUno;
+                    /*** Al recorrer la colección de las lct1s, me traigo el total de Animales por Corral de cada Módulo ****/
+                    $lct2s = \App\Lct2::withCount(['animals' => function ($query) {global $lct1Id; $query->where('lct1_id', $lct1Id);}])->get()->where("animals_count", ">", 0);
+                    foreach ($lct2s as $lct2)
+                    {
+                        $arrNivelUno = array('nivel'        => 5,
+                                             'areaLct1Lct2' => $lct2->name,
+                                             'cantidad'     => $lct2->animals_count);
+                        $totalAreas[] = $arrNivelUno;
+                    }
+                }
+            }
+            $total = Animal::count();
+            $breeds = \App\Breed::withCount('animals')->get()->where("animals_count", ">", 0);
+            return view('report.inventory.totalAnimalsAreas', compact('totalAreas', 'total', 'breeds'));
+        }
     }
 }

@@ -1,5 +1,12 @@
 @extends('layouts.app')
-
+{{--<style>
+    body {
+        background-image: url("{{ asset('img/green-3667895_1920.jpg') }}");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: auto;
+    }--}}
+</style>
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
@@ -69,5 +76,8 @@
             </div>
         </div>
     </div>
+    {{--<div class="row justify-content-center">
+        <img src="{{ asset('img/cow-256.png') }}" alt="Logo">
+    </div>--}}
 </div>
 @endsection
