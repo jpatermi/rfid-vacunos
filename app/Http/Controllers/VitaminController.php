@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Vitamin;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class VitaminController extends Controller
 {
@@ -199,7 +200,40 @@ class VitaminController extends Controller
             }
             $totalGenerals = $totalVitamins;
             $labelVacDewVit = 'Vitaminas';
-            return view('report.general.totalAnimalsGeneral', compact('totalGenerals', 'labelVacDewVit'));
+            $nameRoute = 'vitamins.VitaminPDF';
+            return view('report.general.totalAnimalsGeneral', compact('totalGenerals', 'labelVacDewVit', 'nameRoute'));
         }
+    }
+    /**
+     * Export report to PDF.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function exportPdf()
+    {
+        /*** Con este me traigo el total de Animales por Razas ****/
+        $vitamins = \App\Vitamin::all();
+        $totalVitamins = array();
+        foreach ($vitamins as $vitamin)
+        {
+            $arrNivelCero = array('nivel'            => 1,
+                                  'vaccOrfid'        => $vitamin->name,
+                                  'application_date' => null);
+            $totalVitamins[] = $arrNivelCero;
+            $animals = $vitamin->AnimalVitamins;
+            foreach ($animals as $animal)
+            {
+                $arrNivelUno = array('nivel'            => 4,
+                                     'vaccOrfid'        => $animal->animal_rfid,
+                                     'application_date' => $animal->pivot->application_date->format('d/m/Y'));
+                $totalVitamins[] = $arrNivelUno;
+            }
+        }
+        $totalGenerals = $totalVitamins;
+        $labelVacDewVit = 'Vitaminas';
+
+        $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif']);
+        $pdf ->loadView('report.pdf.VacDewVitExamPDF', compact('totalGenerals', 'labelVacDewVit'));
+        return $pdf->download('vitaminas.pdf');
     }
 }

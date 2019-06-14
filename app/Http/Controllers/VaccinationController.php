@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Vaccination;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class VaccinationController extends Controller
 {
@@ -199,7 +200,39 @@ class VaccinationController extends Controller
             }
             $totalGenerals = $totalVaccinations;
             $labelVacDewVit = 'Vacunas';
-            return view('report.general.totalAnimalsGeneral', compact('totalGenerals', 'labelVacDewVit'));
+            $nameRoute = 'vaccinations.VaccinationPDF';
+            return view('report.general.totalAnimalsGeneral', compact('totalGenerals', 'labelVacDewVit', 'nameRoute'));
         }
+    }
+    /**
+     * Export report to PDF.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function exportPdf()
+    {
+        $vaccinations = \App\Vaccination::all();
+        $totalVaccinations = array();
+        foreach ($vaccinations as $vaccination)
+        {
+            $arrNivelCero = array('nivel'            => 1,
+                                  'vaccOrfid'        => $vaccination->name,
+                                  'application_date' => null);
+            $totalVaccinations[] = $arrNivelCero;
+            $animals = $vaccination->AnimalVaccinations;
+            foreach ($animals as $animal)
+            {
+                $arrNivelUno = array('nivel'             => 4,
+                                     'vaccOrfid'         => $animal->animal_rfid,
+                                     'application_date'  => $animal->pivot->application_date->format('d/m/Y'));
+                $totalVaccinations[] = $arrNivelUno;
+            }
+        }
+        $totalGenerals = $totalVaccinations;
+        $labelVacDewVit = 'Vacunas';
+
+        $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif']);
+        $pdf ->loadView('report.pdf.VacDewVitExamPDF', compact('totalGenerals', 'labelVacDewVit'));
+        return $pdf->download('vacunas.pdf');
     }
 }

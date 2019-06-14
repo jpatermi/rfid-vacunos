@@ -63,6 +63,7 @@
                                     <a class="dropdown-item" href="{{ route('vaccinations.totalAnimalVaccinations') }}">Vacunaciones</a>
                                     <a class="dropdown-item" href="{{ route('dewormers.totalAnimalDewormers') }}">Desparasitaciones</a>
                                     <a class="dropdown-item" href="{{ route('vitamins.totalAnimalVitamins') }}">Vitaminas</a>
+                                    <a class="dropdown-item" href="{{ route('examns.totalAnimalExamns') }}">Exámenes</a>
                                     <a class="dropdown-item" href="{{ route('agegroups.totalAnimalsAgeGroups') }}">Grupos Etarios</a>
                                 </div>
                             </li>
@@ -74,6 +75,7 @@
                                     <a class="dropdown-item" href="{{ route('vaccinations.index') }}">Vacunas</a>
                                     <a class="dropdown-item" href="{{ route('dewormers.index') }}">Desparasitaciones</a>
                                     <a class="dropdown-item" href="{{ route('vitamins.index') }}">Vitaminas</a>
+                                    <a class="dropdown-item" href="{{ route('examns.index') }}">Exámenes</a>
                                     <a class="dropdown-item" href="{{ route('breeds.index') }}">Razas</a>
                                     <a class="dropdown-item" href="{{ route('agegroups.index') }}">Grupos Etarios</a>
                                     <a class="dropdown-item" href="{{ route('diagnostics.index') }}">Diagnósticos</a>

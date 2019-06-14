@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Dewormer;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class DewormerController extends Controller
 {
@@ -199,7 +200,39 @@ class DewormerController extends Controller
             }
             $totalGenerals = $totalDewormers;
             $labelVacDewVit = 'Desparasitantes';
-            return view('report.general.totalAnimalsGeneral', compact('totalGenerals', 'labelVacDewVit'));
+            $nameRoute = 'dewormers.DewormerPDF';
+            return view('report.general.totalAnimalsGeneral', compact('totalGenerals', 'labelVacDewVit', 'nameRoute'));
         }
+    }
+    /**
+     * Export report to PDF.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function exportPdf()
+    {
+        $dewormers = \App\Dewormer::all();
+        $totalDewormers = array();
+        foreach ($dewormers as $dewormer)
+        {
+            $arrNivelCero = array('nivel'            => 1,
+                                  'vaccOrfid'        => $dewormer->name,
+                                  'application_date' => null);
+            $totalDewormers[] = $arrNivelCero;
+            $animals = $dewormer->animalDewormers;
+            foreach ($animals as $animal)
+            {
+                $arrNivelUno = array('nivel'            => 4,
+                                     'vaccOrfid'        => $animal->animal_rfid,
+                                     'application_date' => $animal->pivot->application_date->format('d/m/Y'));
+                $totalDewormers[] = $arrNivelUno;
+            }
+        }
+        $totalGenerals = $totalDewormers;
+        $labelVacDewVit = 'Desparasitantes';
+
+        $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif']);
+        $pdf ->loadView('report.pdf.VacDewVitExamPDF', compact('totalGenerals', 'labelVacDewVit'));
+        return $pdf->download('desparasitantes.pdf');
     }
 }

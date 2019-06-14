@@ -38,10 +38,10 @@ class Examn extends Model
     /**
      * Get the comments for the animals.
     */
-    public function AnimalExams()
+    public function AnimalExamns()
     {
         return $this->belongsToMany('App\Animal')
-                    ->using('App\AnimalExam')
+                    ->using('App\AnimalExamn')
                     ->withPivot('application_date', 'id')
                     ->wherePivot('deleted_at', null);
     }

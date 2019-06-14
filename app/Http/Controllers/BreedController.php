@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Breed;
 use App\Animal;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class BreedController extends Controller
 {
@@ -200,5 +201,18 @@ class BreedController extends Controller
             $totalBreeds[] = $name . $breed->animals_count;
         }
         return response()->json(['totals' => $totalBreeds], 200);
+    }
+    /**
+     * Export report to PDF.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function exportPdf()
+    {
+        $breeds = \App\Breed::withCount('animals')->get()->where("animals_count", ">", 0);
+
+        $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif']);
+        $pdf ->loadView('report.pdf.InvBreedsPDF', compact('totalAreas', 'total', 'breeds'));
+        return $pdf->download('inv-razas.pdf');
     }
 }

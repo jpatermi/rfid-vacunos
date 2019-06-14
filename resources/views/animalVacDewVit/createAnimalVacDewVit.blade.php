@@ -29,7 +29,7 @@
               <p class="text-danger"><strong>{{ $errors->first('vaccination_id') }}</strong></p>
             @endif
           </div>
-          <div class="form-group">
+          <div class="form-group" @if($label == 'Examen') hidden @endif>
             <label class="font-weight-bold" for="dose">Dosis (cc):</label>
             <input type="text" class="form-control" name="dose" id="dose" placeholder="00.00" value="{{ old('dose') }}">
             @if($errors->has('dose'))

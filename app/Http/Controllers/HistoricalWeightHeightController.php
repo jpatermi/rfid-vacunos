@@ -24,9 +24,11 @@ class HistoricalWeightHeightController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $animal_id = $request->all();
+        $animal = Animal::find($animal_id)->first();
+        return view('historicals.createHistorical', compact('animal'));
     }
 
     /**
@@ -39,7 +41,12 @@ class HistoricalWeightHeightController extends Controller
     {
         try {
             global $data, $animalHistoricals, $animal;
-            $data = $request->json()->all();
+            $data = $request->validate([
+              'animal_id'        => 'required',
+              'weight'           => 'required|numeric',
+              'height'           => 'required|numeric',
+              'measurement_date' => 'required|date',
+            ]);
             $animal = Animal::find($data['animal_id']);
             if($animal) {
                 /*** Se verifica si se ha tomado la misma medida antes ***/
@@ -64,7 +71,11 @@ class HistoricalWeightHeightController extends Controller
                         $animal->last_height = $last_historical->height;
                         $animal->save();
                     });
-                return response()->json($animalHistoricals, 201);
+                    if (request()->header('Content-Type') == 'application/json') {
+                        return response()->json($animalHistoricals, 201);
+                    } else {
+                        return redirect()->route('historicals.show', $animal->id);
+                    }
                 } else {
                     return response()->json(['error' => 'El Animal: ' . $animal->animal_rfid . ' ya tiene registrado el Peso: ' . $animalHistoricals->weight . ' y la Altura: ' . $animalHistoricals->weight . ' de Fecha: ' . $animalHistoricals->measurement_date->format('d/m/Y')], 406);
                 }
@@ -112,11 +123,20 @@ class HistoricalWeightHeightController extends Controller
                                          'line' => $line);
                     $applications[] = $application;
                 }
-                return response()->json($applications, 200);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json($applications, 200);
+                } else {
+                    return view('historicals.showHistorical', compact('animal', 'applications'));
+                }
             }
             else
             {
-                return response()->json(['error' => 'el Animal ' . $animal->animal_rfid . ' no tiene Histórico aún'], 406);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json(['error' => 'el Animal ' . $animal->animal_rfid . ' no tiene Histórico aún'], 406);
+                } else {
+                    $applications = '';
+                    return view('historicals.showHistorical', compact('animal', 'applications'));
+                }
             }
         }
         else
@@ -131,9 +151,11 @@ class HistoricalWeightHeightController extends Controller
      * @param  \App\HistoricalWeightHeight  $animalVitamin
      * @return \Illuminate\Http\Response
      */
-    public function edit(HistoricalWeightHeight $animalVitamin)
+    public function edit(HistoricalWeightHeight $historical)
     {
-        //
+        $animal = Animal::find($historical->animal_id);
+        $historical = HistoricalWeightHeight::find($historical->id);
+        return view('historicals.editHistorical', compact('animal', 'historical'));
     }
 
     /**
@@ -147,7 +169,12 @@ class HistoricalWeightHeightController extends Controller
     {
         try {
             global $data, $animalHistoricals;
-            $data = $request->json()->all();
+            $data = $request->validate([
+              'animal_id'        => 'required',
+              'weight'           => 'required|numeric',
+              'height'           => 'required|numeric',
+              'measurement_date' => 'required|date',
+            ]);
             $animalHistoricals = HistoricalWeightHeight::find($id);
             if($animalHistoricals)
             {
@@ -166,7 +193,11 @@ class HistoricalWeightHeightController extends Controller
                     $animal->last_height = $last_historical->height;
                     $animal->save();
                 });
-                return response()->json($animalHistoricals, 201);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json($animalHistoricals, 201);
+                } else {
+                    return redirect()->route('historicals.show', $animalHistoricals->animal_id);
+                }
             } else {
                 return response()->json(['error' => 'Histórico de Peso y Altura no existente'], 406);
             }
@@ -187,7 +218,11 @@ class HistoricalWeightHeightController extends Controller
             $animalHistoricals = HistoricalWeightHeight::find($id);
             if($animalHistoricals) {
                 $animalHistoricals->delete();
-                return response()->json(['exitoso' => 'Histórico eliminado con éxito'], 204);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json(['exitoso' => 'Histórico eliminado con éxito'], 204);
+                } else {
+                    return redirect()->route('historicals.show', $animalHistoricals->animal_id);
+                }
             } else {
                 return response()->json(['error' => 'Histórico de Peso y Altura no existente'], 406);
             }

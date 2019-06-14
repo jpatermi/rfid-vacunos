@@ -4,7 +4,7 @@
     <div class="card">
       <div class="card-header">
         <div class="d-flex justify-content-between align-items-end p-2">
-            <h3>Listado de Enfermedades
+            <h3>Listado de Enfermedades de:
               <small class="text-danger">{{ $animal->animal_rfid }}</small>
             </h3>
             <div>
@@ -33,7 +33,7 @@
                           {{ method_field('DELETE') }}
                           @csrf
                           <a href="{{ route('diseases.edit', $animalDisease['id']) }}" class="btn btn-link text-primary">
-                              <span data-toggle="tooltip" data-placement="top" title="Editar Enfermedad" ><img class="" src="{{ asset('img/ico/baseline-edit-24px.svg') }}" alt="Editar"></span>
+                              <span data-toggle="tooltip" data-placement="top" title="Editar Enfermedad"><img class="" src="{{ asset('img/ico/baseline-edit-24px.svg') }}" alt="Editar"></span>
                           </a>
                           <button type="submit" class="btn btn-link text-primary" onclick="return confirm('¿Esta seguro de eliminar la Enfermedad: {{ $animalDisease['diagnostic_name'] }}?')">
                               <span data-toggle="tooltip" data-placement="top" title="Eliminar Enfermedad"><img class="" src="{{ asset('img/ico/baseline-delete-24px.svg') }}" alt="Eliminar"></span>

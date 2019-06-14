@@ -195,6 +195,9 @@ return [
         'characteristic'        => 'Característica',
         'production_date'       => 'fecha de producción',
         'colostrum'             => 'Calostro',
-        'milk'                  => 'Leche'
+        'milk'                  => 'Leche',
+        'measurement_date'      => 'Fecha Medición',
+        'weight'                => 'Peso',
+        'height'                => 'Altura'
     ],
 ];

@@ -23,8 +23,9 @@
 	                            <a class="dropdown-item" href="{{ route('animalvaccination.show', $animal) }}">Vacunas</a>
 	                            <a class="dropdown-item" href="{{ route('animaldewormer.show', $animal) }}">Desparasitaciones</a>
 	                            <a class="dropdown-item" href="{{ route('animalvitamin.show', $animal) }}">Vitaminas</a>
+	                            <a class="dropdown-item" href="{{ route('animalexamn.show', $animal) }}">Exámenes</a>
 	                            <a class="dropdown-item" href="{{ route('disease.GetAnimalDiseases', $animal) }}">Enfermedades</a>
-	                            <a class="dropdown-item" href="#">Históricos de Peso y Altura</a>
+	                            <a class="dropdown-item" href="{{ route('historicals.show', $animal) }}">Históricos de Peso y Altura</a>
 	                        </div>
 	                    </li>
 	                    <a class="nav-item nav-link active text-primary" href="{{ route('productions.show', $animal) }}">Registro de Producción</a>

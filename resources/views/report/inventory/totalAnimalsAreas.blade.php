@@ -42,7 +42,7 @@
               </div>
               <div class="card-footer">
                 {{--<a href="{{ route('animals.index') }}" class="btn-link btn">Regresar al listado de Animales</a>--}}
-                <!--Redirect::back();-->
+                <a href="{{ route('animals.InvUbicPDF') }}" class="btn-link btn">Descargar PDF</a>
               </div>
             </div>
         </div>
@@ -86,7 +86,7 @@
               </div>
               <div class="card-footer">
                 {{--<a href="{{ route('animals.index') }}" class="btn-link btn">Regresar al listado de Animales</a>--}}
-                <!--Redirect::back();-->
+                <a href="{{ route('breeds.BreedsPDF') }}" class="btn-link btn">Descargar PDF</a>
               </div>
             </div>
         </div>

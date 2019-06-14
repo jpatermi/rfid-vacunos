@@ -1,18 +1,10 @@
-@extends('layouts.app')
-
-@section('content')
+<!-- Styles -->
+<link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <div class="row justify-content-center">
         <div class="col-md-12">
-            <div class="card">
-              <div class="card-header">
-                <div class="d-flex justify-content-between align-items-end p-2">
+                <div class="text-center">
                     <h2>{{ $labelVacDewVit }} por Animales</h2>
-                    <div>
-                      {{--<a href="{{ route('animals.index') }}" class="btn-link btn pb-3">Regresar al listado de Animales</a>--}}
-                    </div>
                 </div>
-              </div>
-              <div class="card-body">
                 @if ($totalGenerals)
                     <table class="table table-striped table-hover">
                       <thead class="thead-dark">
@@ -33,12 +25,7 @@
                 @else
                     <p>No existen Animales registrados.</p>
                 @endif
-              </div>
-              <div class="card-footer">
-                {{--<a href="{{ route('animals.index') }}" class="btn-link btn">Regresar al listado de Animales</a>--}}
-                <a href="{{ route($nameRoute) }}" class="btn-link btn">Descargar PDF</a>
-              </div>
-            </div>
         </div>
     </div>
-@endsection
+<!-- Scripts -->
+<script src="{{ asset('js/app.js') }}"></script>

@@ -103,12 +103,9 @@ class AnimalDewormerController extends Controller
                                          'id_ani_vac_desp_vit' => $dewormer->pivot->id);
                     $applications[] = $application;
                 }
-                if (request()->header('Content-Type') == 'application/json')
-                {
+                if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($applications, 200);
-                }
-                else
-                {
+                } else {
                     $vaccinations = Dewormer::orderBy('name')->get();
                     //$applications = $dewormersAnimal;
                     $model        = 'animaldewormer';
@@ -120,12 +117,9 @@ class AnimalDewormerController extends Controller
             }
             else
             {
-                if (request()->header('Content-Type') == 'application/json')
-                {
+                if (request()->header('Content-Type') == 'application/json') {
                     return response()->json(['error' => 'el Animal ' . $animal->animal_rfid . ' no ha sido desparasitado aún'], 406);
-                }
-                else
-                {
+                } else {
                     $vaccinations = Dewormer::orderBy('name')->get();
                     $applications = '';
                     $model        = 'animaldewormer';

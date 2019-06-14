@@ -15,6 +15,7 @@ use App\Lct1;
 use App\Lct2;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class AnimalController extends Controller
 {
@@ -484,5 +485,48 @@ class AnimalController extends Controller
             $breeds = \App\Breed::withCount('animals')->get()->where("animals_count", ">", 0);
             return view('report.inventory.totalAnimalsAreas', compact('totalAreas', 'total', 'breeds'));
         }
+    }
+    /**
+     * Export report to PDF.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function exportPdf()
+    {
+        $areas = \App\Area::withCount('animals')->get()->where("animals_count", ">", 0);
+        $totalAreas = array();
+        global $areaId, $lct1Id;
+        foreach ($areas as $area)
+        {
+            $arrNivelUno = array('nivel'        => 1,
+                                 'areaLct1Lct2' => $area->name,
+                                 'cantidad'     => $area->animals_count);
+            $areaId = $area->id;
+            $totalAreas[] = $arrNivelUno;
+            /*** Al recorrer la colección de las áreas, me traigo el total de Animales por Módulo de cada área ****/
+            $lct1s = \App\Lct1::withCount(['animals' => function ($query) {global $areaId; $query->where('area_id', $areaId);}])->get()->where("animals_count", ">", 0);
+            foreach ($lct1s as $lct1)
+            {
+                $arrNivelUno = array('nivel'        => 3,
+                                     'areaLct1Lct2' => $lct1->name,
+                                     'cantidad'     => $lct1->animals_count);
+                $lct1Id = $lct1->id;
+                $totalAreas[] = $arrNivelUno;
+                /*** Al recorrer la colección de las lct1s, me traigo el total de Animales por Corral de cada Módulo ****/
+                $lct2s = \App\Lct2::withCount(['animals' => function ($query) {global $lct1Id; $query->where('lct1_id', $lct1Id);}])->get()->where("animals_count", ">", 0);
+                foreach ($lct2s as $lct2)
+                {
+                    $arrNivelUno = array('nivel'        => 5,
+                                         'areaLct1Lct2' => $lct2->name,
+                                         'cantidad'     => $lct2->animals_count);
+                    $totalAreas[] = $arrNivelUno;
+                }
+            }
+        }
+        $total = Animal::count();
+
+        $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif']);
+        $pdf ->loadView('report.pdf.InvUbicPDF', compact('totalAreas', 'total'));
+        return $pdf->download('inv-ubic.pdf');
     }
 }

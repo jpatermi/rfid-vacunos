@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\AnimalExamn;
 use Illuminate\Http\Request;
 use App\Animal;
+use App\Examn;
 
 class AnimalExamnController extends Controller
 {
@@ -37,7 +38,11 @@ class AnimalExamnController extends Controller
     public function store(Request $request)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+                'animal_id'         => 'required',
+                'examn_id'          => 'required',
+                'application_date'  => 'required|date',
+            ]);
             $animal = Animal::find($data['animal_id']);
             if($animal) {
                 $aniexam = $animal->examns()->where('animal_id', $data['animal_id'])
@@ -51,7 +56,11 @@ class AnimalExamnController extends Controller
                       'examn_id' => $data['examn_id'],
                       'application_date' => $data['application_date'],
                     ]);
-                    return response()->json($aniexam, 201);
+                    if (request()->header('Content-Type') == 'application/json') {
+                        return response()->json($aniexam, 201);
+                    } else {
+                        return redirect()->route('animalexamn.show', $aniexam->animal_id);
+                    }
                 } else {
                     return response()->json(['error' => 'El Animal: ' . $animal->animal_rfid . ' ya tiene el Examen: ' . $aniexam->name . ' de fecha: ' . $aniexam->pivot->application_date->format('d/m/Y')], 406);
                 }
@@ -86,16 +95,35 @@ class AnimalExamnController extends Controller
                 {
                     $application = array('id_vac_desp_vit' => $examn->id,
                                          'name_vac_desp_vit' => $examn->name,
-                                         'dose' => null,
+                                         'dose' => 0,
                                          'application_date' => $examn->pivot->application_date->format('d/m/Y'),
                                          'id_ani_vac_desp_vit' => $examn->pivot->id);
                     $applications[] = $application;
                 }
-                return response()->json($applications, 200);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json($applications, 200);
+                } else {
+                    $vaccinations = Examn::orderBy('name')->get();
+                    $model        = 'animalexamn';
+                    $title        = 'Exámenes aplicados';
+                    $label        = 'Examen';
+                    $nomCampoVacDewVit = 'examn_id';
+                    return view('animalVacDewVit.showAnimalVacDewVit', compact('applications', 'animal', 'model', 'title', 'vaccinations', 'label', 'nomCampoVacDewVit'));
+                }
             }
             else
             {
-                return response()->json(['error' => 'el Animal ' . $animal->animal_rfid . ' no tiene Exámenes aún'], 406);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json(['error' => 'el Animal ' . $animal->animal_rfid . ' no tiene Exámenes aún'], 406);
+                } else {
+                    $vaccinations = Examn::orderBy('name')->get();
+                    $applications = '';
+                    $model        = 'animalexamn';
+                    $title        = 'Exámenes aplicados';
+                    $label        = 'Examen';
+                    $nomCampoVacDewVit = 'examn_id';
+                    return view('animalVacDewVit.showAnimalVacDewVit', compact('applications', 'animal', 'model', 'title', 'vaccinations', 'label', 'nomCampoVacDewVit'));
+                }
             }
         }
         else
@@ -125,14 +153,22 @@ class AnimalExamnController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+                'animal_id' => 'required',
+                'examn_id' => 'required',
+                'application_date' => 'required|date',
+            ]);
             $aniexam = AnimalExamn::find($id);
             if($aniexam) {
                 $aniexam->animal_id = $data['animal_id'];
                 $aniexam->examn_id = $data['examn_id'];
                 $aniexam->application_date = $data['application_date'];
                 $aniexam->save();
-                return response()->json($aniexam, 201);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json($aniexam, 201);
+                } else {
+                    return redirect()->route('animalexamn.show', $aniexam->animal_id);
+                }
             } else {
                 return response()->json(['error' => 'Aplicación de Examen no existente'], 406);
             }
@@ -153,7 +189,11 @@ class AnimalExamnController extends Controller
             $aniexam = AnimalExamn::find($id);
             if($aniexam) {
                 $aniexam->delete();
-                return response()->json(['exitoso' => 'Aplicación eliminada con éxito'], 204);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json(['exitoso' => 'Aplicación eliminada con éxito'], 204);
+                } else {
+                    return redirect()->route('animalexamn.show', $aniexam->animal_id);
+                }
             } else {
                 return response()->json(['error' => 'Aplicación de Examen no existente'], 406);
             }

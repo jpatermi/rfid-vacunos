@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Examn;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class ExamnController extends Controller
 {
@@ -15,7 +16,14 @@ class ExamnController extends Controller
     public function index()
     {
         $examn = Examn::all()->sortBy('name')->values();
-        return response()->json($examn, 200);
+        if (request()->header('Content-Type') == 'application/json') {
+            return response()->json($examn, 200);
+        } else {
+            $varVacDewVits = $examn;
+            $labelVacDewVit = 'Examen';
+            $model = 'examns';
+            return view('configuration.VacDewVit.indexVacDewVit', compact('varVacDewVits', 'labelVacDewVit', 'model'));
+        }
     }
 
     /**
@@ -25,7 +33,9 @@ class ExamnController extends Controller
      */
     public function create()
     {
-        //
+        $labelVacDewVit = 'Examen';
+        $model = 'examns';
+        return view('configuration.VacDewVit.createVacDewVit', compact('labelVacDewVit', 'model'));
     }
 
     /**
@@ -37,12 +47,19 @@ class ExamnController extends Controller
     public function store(Request $request)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+              'name' => 'required',
+              'characteristic' => 'required',
+            ]);
             $examn = Examn::create([
               'name' => $data['name'],
               'characteristic' => $data['characteristic'],
             ]);
-            return response()->json($examn, 201);
+            if (request()->header('Content-Type') == 'application/json') {
+                return response()->json($examn, 201);
+            } else {
+                return redirect()->route('examns.index');
+            }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
         }
@@ -72,7 +89,10 @@ class ExamnController extends Controller
      */
     public function edit(Examn $examn)
     {
-        //
+        $varVacDewVit = Examn::find($examn->id);
+        $labelVacDewVit = 'Examen';
+        $model = 'examns';
+        return view('configuration.VacDewVit.editVacDewVit', compact('varVacDewVit', 'labelVacDewVit', 'model'));
     }
 
     /**
@@ -85,13 +105,20 @@ class ExamnController extends Controller
     public function update(Request $request, $examn)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+              'name' => 'required',
+              'characteristic' => 'required',
+            ]);
             $examn = Examn::find($examn);
             if($examn) {
                 $examn->name = $data['name'];
                 $examn->characteristic = $data['characteristic'];
                 $examn->save();
-                return response()->json($examn, 201);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json($examn, 201);
+                } else {
+                    return redirect()->route('examns.index');
+                }
             } else {
                 return response()->json(['error' => 'Examen no existente'], 406);
             }
@@ -120,7 +147,11 @@ class ExamnController extends Controller
                     return response()->json(['conflicto' => $animalRFID], 409);
                 } else {
                     $examn->delete();
-                    return response()->json(['exitoso' => 'Examen: ' . $examn->name . ' eliminado con éxito'], 204);
+                    if (request()->header('Content-Type') == 'application/json') {
+                        return response()->json(['exitoso' => 'Examen: ' . $examn->name . ' eliminado con éxito'], 204);
+                    } else {
+                        return redirect()->route('examns.index');
+                    }
                 }
             } else {
                 return response()->json(['error' => 'Examen no existente'], 406);
@@ -139,16 +170,69 @@ class ExamnController extends Controller
         /*** Con este me traigo el total de Animales por Razas ****/
         $examns = \App\Examn::all();
         $totalExamns = array();
+        if (request()->header('Content-Type') == 'application/json') {
+            foreach ($examns as $examn)
+            {
+                $name   = $examn->name;
+                $totalExamns[] = $name;
+                $animals = $examn->AnimalExamns;
+                foreach ($animals as $animal)
+                {
+                    $totalExamns[] = "\t\t" . $animal->animal_rfid . "\t\t\t\t\t\t\t\t" . $animal->pivot->application_date->format('d/m/Y');
+                }
+            }
+            return response()->json(['totals' => $totalExamns], 200);
+        } else {
+            foreach ($examns as $examn)
+            {
+                $arrNivelCero = array('nivel'            => 1,
+                                      'vaccOrfid'        => $examn->name,
+                                      'application_date' => null);
+                $totalExamns[] = $arrNivelCero;
+                $animals = $examn->AnimalExamns;
+                foreach ($animals as $animal)
+                {
+                    $arrNivelUno = array('nivel'             => 4,
+                                         'vaccOrfid'         => $animal->animal_rfid,
+                                         'application_date'  => $animal->pivot->application_date->format('d/m/Y'));
+                    $totalExamns[] = $arrNivelUno;
+                }
+            }
+            $totalGenerals = $totalExamns;
+            $labelVacDewVit = 'Exámenes';
+            $nameRoute = 'examns.ExamnPDF';
+            return view('report.general.totalAnimalsGeneral', compact('totalGenerals', 'labelVacDewVit', 'nameRoute'));
+        }
+    }
+    /**
+     * Export report to PDF.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function exportPdf()
+    {
+        $examns = \App\Examn::all();
+        $totalExamns = array();
         foreach ($examns as $examn)
         {
-            $name   = $examn->name;
-            $totalExamns[] = $name;
+            $arrNivelCero = array('nivel'            => 1,
+                                  'vaccOrfid'        => $examn->name,
+                                  'application_date' => null);
+            $totalExamns[] = $arrNivelCero;
             $animals = $examn->AnimalExamns;
             foreach ($animals as $animal)
             {
-                $totalExamns[] = "\t\t" . $animal->animal_rfid . "\t\t\t\t\t\t\t\t" . $animal->pivot->application_date->format('d/m/Y');
+                $arrNivelUno = array('nivel'             => 4,
+                                     'vaccOrfid'         => $animal->animal_rfid,
+                                     'application_date'  => $animal->pivot->application_date->format('d/m/Y'));
+                $totalExamns[] = $arrNivelUno;
             }
         }
-        return response()->json(['totals' => $totalExamns], 200);
+        $totalGenerals = $totalExamns;
+        $labelVacDewVit = 'Exámenes';
+
+        $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif']);
+        $pdf ->loadView('report.pdf.VacDewVitExamPDF', compact('totalGenerals', 'labelVacDewVit'));
+        return $pdf->download('examenes.pdf');
     }
 }

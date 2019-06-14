@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\AgeGroup;
 use Illuminate\Http\Request;
 use App\Animal;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class AgeGroupController extends Controller
 {
@@ -179,5 +180,17 @@ class AgeGroupController extends Controller
         } else {
             return view('report.ageGroup.totalAnimalsAgeGroups', compact('ageGroups'));
         }
+    }
+    /**
+     * Export report to PDF.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function exportPdf()
+    {
+        $ageGroups = \App\AgeGroup::withCount('animals')->get()->where("animals_count", ">", 0);
+        $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif']);
+        $pdf ->loadView('report.pdf.AgeGroupsPDF', compact('ageGroups'));
+        return $pdf->download('grupo-etario.pdf');
     }
 }

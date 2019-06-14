@@ -19,7 +19,9 @@
               <thead class="thead-dark">
                 <tr>
                   <th scope="col">Nombre</th>
-                  <th scope="col">Dosis</th>
+                  @if($label != 'Examen')
+                    <th scope="col">Dosis</th>
+                  @endif
                   <th scope="col">Aplicación</th>
                   <th scope="col">Acciones</th>
                 </tr>
@@ -28,7 +30,9 @@
               @foreach ($applications as $application)
               <tr>
                   <th>{{ $application['name_vac_desp_vit'] }}</th>
-                  <td>{{ $application['dose'] }}</td>
+                  @if($label != 'Examen')
+                    <td>{{ $application['dose'] }}</td>
+                  @endif
                   <td id="fecha">{{ $application['application_date'] }}</td>
                   <td>
                       <form action="{{ route($model . '.destroy', $application['id_ani_vac_desp_vit']) }}" method="POST">
