@@ -164,7 +164,7 @@ class AgeGroupController extends Controller
      */
     public function totalAnimalsAgeGroups()
     {
-        /*** Con este me traigo el total de Animales por Razas ****/
+        /*** Con este me traigo el total de Animales por Grupo Etario ****/
         $ageGroups = \App\AgeGroup::withCount('animals')->get()->where("animals_count", ">", 0);
         if (request()->header('Content-Type') == 'application/json') {
             $totalAgeGroup = array();

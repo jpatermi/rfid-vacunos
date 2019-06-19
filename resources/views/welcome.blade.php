@@ -7,7 +7,7 @@
         <title>RFID-Animal</title>
 
         <!-- Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet" type="text/css">
+        {{--<link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet" type="text/css">--}}
 
         <!-- Icon -->
         <link rel="icon" href="{{ asset('img/cow-256.png') }}">

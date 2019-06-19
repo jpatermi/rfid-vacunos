@@ -10,8 +10,8 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Fonts -->
-    <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" type="text/css">
+    {{--<link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" type="text/css">--}}
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
@@ -26,7 +26,7 @@
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-dark bg-dark navbar-laravel fixed-top">
             <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
+                <a class="navbar-brand" href="{{ url('/home') }}">
                     <img src="{{ asset('img/cow-256.png') }}" width="30" height="30" class="d-inline-block align-top" alt="Logo RFID">
                     {{ config('app.name', 'Laravel') }}
                 </a>
@@ -112,8 +112,14 @@
             @yield('content')
         </main>
     </div>
+    <div>
+        @yield('graphic')
+    </div>
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
+    <!-- Languaje Charjs-->
+    <script src="{{asset('chartjs/Chart.js')}}"></script>
+    <script src="{{asset('chartjs/Chart.min.js')}}"></script>
     <!-- Languaje DatePicker-->
     <script src="{{asset('datePicker/js/bootstrap-datepicker.js')}}"></script>
     <script src="{{asset('datePicker/locales/bootstrap-datepicker.es.min.js')}}"></script>

@@ -39,7 +39,7 @@
               @endif
             </div>
             <div class="form-group col-md-8">
-              <label class="font-weight-bold" for="height">Leche (Lts):</label>
+              <label class="font-weight-bold" for="height">Altura (Cms):</label>
               <input type="text" class="form-control" name="height" id="height" placeholder="00" value="{{ old('height', $historical->height) }}">
               @if($errors->has('height'))
                 <p class="text-danger"><strong>{{ $errors->first('height') }}</strong></p>
