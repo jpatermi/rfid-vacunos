@@ -61,14 +61,14 @@
 				<div class="form-row nav justify-content-center">
 					<div class="form-group col-md-4">
 						<label class="font-weight-bold" for="mother_rfid">RFID Madre:</label>
-						<input type="text" class="form-control" name="mother_rfid" id="mother_rfid" placeholder="0000000000" maxlength="10" minlength="10" value="{{ old('mother_rfid', $animal->mother_rfid) }}">
+						<input type="text" class="form-control" name="mother_rfid" id="mother_rfid" placeholder="RFID o ID" maxlength="50" value="{{ old('mother_rfid', $animal->mother_rfid) }}">
 						@if($errors->has('mother_rfid'))
 							<p class="text-danger"><strong>{{ $errors->first('mother_rfid') }}</strong></p>
 						@endif
 					</div>
 					<div class="form-group col-md-4">
 						<label class="font-weight-bold" for="father_rfid">RFID Padre:</label>
-						<input type="text" class="form-control" name="father_rfid" id="father_rfid" placeholder="0000000000" maxlength="10" minlength="10" value="{{ old('father_rfid', $animal->father_rfid) }}">
+						<input type="text" class="form-control" name="father_rfid" id="father_rfid" placeholder="RFID o ID" maxlength="50" value="{{ old('father_rfid', $animal->father_rfid) }}">
 						@if($errors->has('father_rfid'))
 							<p class="text-danger"><strong>{{ $errors->first('father_rfid') }}</strong></p>
 						@endif

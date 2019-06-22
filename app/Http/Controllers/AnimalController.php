@@ -72,10 +72,10 @@ class AnimalController extends Controller
                 'gender'        => 'required|max:1',
                 'birthdate'     => 'required|date|max:10',
                 'breed_id'      => 'required',
-                'mother_rfid'   => 'required|max:10|min:10',
-                'father_rfid'   => 'required|max:10|min:10',
+                'mother_rfid'   => '',
+                'father_rfid'   => '',
                 'last_weight'   => 'required',
-                'last_height'   => 'required',
+                'last_height'   => '',
                 'age_group_id'  => 'required',
                 'farm_id'       => 'required',
                 'area_id'       => 'required',
@@ -308,6 +308,29 @@ class AnimalController extends Controller
     {
         $animal = Animal::find($animal->id);
         if ($animal) {
+            if ($animal->vaccinations->isNotEmpty()) {
+                return response()->json(['error' => 'El Animal: ' . $animal->animal_rfid . ' tiene Vacunas'], 409);
+            } elseif ($animal->dewormers->isNotEmpty()) {
+                return response()->json(['error' => 'El Animal: ' . $animal->animal_rfid . ' tiene Desparasitantes'], 409);
+            } elseif ($animal->vitamins->isNotEmpty()) {
+                return response()->json(['error' => 'El Animal: ' . $animal->animal_rfid . ' tiene Vitaminas'], 409);
+            } elseif ($animal->examns->isNotEmpty()) {
+                return response()->json(['error' => 'El Animal: ' . $animal->animal_rfid . ' tiene Exámenes'], 409);
+            } elseif ($animal->diseases->isNotEmpty()) {
+                return response()->json(['error' => 'El Animal: ' . $animal->animal_rfid . ' tiene Diagnósticos'], 409);
+            } elseif ($animal->animalHistoricals->isNotEmpty()) {
+                return response()->json(['error' => 'El Animal: ' . $animal->animal_rfid . ' tiene Históricos de Peso y Altura'], 409);
+            } elseif ($animal->productions->isNotEmpty()) {
+                return response()->json(['error' => 'El Animal: ' . $animal->animal_rfid . ' tiene Producción'], 409);
+            } elseif ($animal->physicalCharacteristics->isNotEmpty()) {
+                return response()->json(['error' => 'El Animal: ' . $animal->animal_rfid . ' tiene Características Físicas'], 409);
+            }
+            /*** Se Eliminan también los Movimientos del Animal por todas las Ubicaciones ***/
+            $animalLocations = $animal->animalLocations;
+            foreach ($animalLocations as $animalLocation)
+            {
+                $animalLocation->delete();
+            }
             $animal->delete();
             if (request()->header('Content-Type') == 'application/json') {
                 return response()->json(['exitoso' => 'Animal: ' . $animal->animal_rfid . ' eliminado con éxito'], 204);

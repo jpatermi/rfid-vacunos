@@ -6,6 +6,7 @@ use App\Area;
 use Illuminate\Http\Request;
 use App\Animal;
 use App\Lct1;
+use App\Farm;
 
 class AreaController extends Controller
 {
@@ -16,8 +17,20 @@ class AreaController extends Controller
      */
     public function index()
     {
-        $areas= Area::all()->sortBy('name')->values();
-        return response()->json($areas, 200);
+        $areas= Area::orderBy('farm_id')->orderBy('name')->get();
+        if (request()->header('Content-Type') == 'application/json') {
+            return response()->json($areas, 200);
+        } else {
+            foreach ($areas as $area) {
+                $arrAreaLct1Lct2s[] = array('id'       => $area->id,
+                                            'name'     => $area->name,
+                                            'nameSup'  => $area->farm->name);
+            }
+            $model = 'areas';
+            $labelAreaLct1Lct2 = 'Área';
+            $labelNameSup = 'Granja';
+            return view('configuration.AreasLct1sLct2s.indexAreaLct1Lct2', compact('arrAreaLct1Lct2s', 'model', 'labelAreaLct1Lct2', 'labelNameSup'));
+        }
     }
 
     /**
@@ -27,7 +40,12 @@ class AreaController extends Controller
      */
     public function create()
     {
-        //
+        $varComboSups = Farm::all()->sortBy('name');
+        $model = 'areas';
+        $labelAreaLct1Lct2 = 'Área';
+        $labelNameSup = 'Granja';
+        $fieldNameSup = 'farm_id';
+        return view('configuration.AreasLct1sLct2s.createAreaLct1Lct2', compact('varComboSups', 'model', 'labelAreaLct1Lct2', 'labelNameSup', 'fieldNameSup'));
     }
 
     /**
@@ -39,12 +57,19 @@ class AreaController extends Controller
     public function store(Request $request)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+                'name'      => 'required',
+                'farm_id'   => 'required'
+            ]);
             $area = Area::create([
               'name' => $data['name'],
               'farm_id' => $data['farm_id']
             ]);
-            return response()->json($area, 201);
+            if (request()->header('Content-Type') == 'application/json') {
+                return response()->json($area, 201);
+            } else {
+                return redirect()->route('areas.index');
+            }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
         }
@@ -72,9 +97,19 @@ class AreaController extends Controller
      * @param  \App\Area  $area
      * @return \Illuminate\Http\Response
      */
-    public function edit(Area $area)
+    public function edit($area)
     {
-        //
+        $area = Area::find($area);
+        $arrAreaLct1Lct2 = array('id'       => $area->id,
+                                 'name'     => $area->name,
+                                 'idSup'    => $area->farm->id,
+                                 'nameSup'  => $area->farm->name);
+        $varComboSups = Farm::all()->sortBy('name');
+        $model = 'areas';
+        $labelAreaLct1Lct2 = 'Área';
+        $labelNameSup = 'Granja';
+        $fieldNameSup = 'farm_id';
+        return view('configuration.AreasLct1sLct2s.editAreaLct1Lct2', compact('varComboSups', 'model', 'labelAreaLct1Lct2', 'labelNameSup', 'arrAreaLct1Lct2', 'fieldNameSup'));
     }
 
     /**
@@ -87,14 +122,20 @@ class AreaController extends Controller
     public function update(Request $request, $area)
     {
         try {
-
-            $data = $request->json()->all();
+            $data = $request->validate([
+                'name'      => 'required',
+                'farm_id'   => 'required'
+            ]);
             $area = Area::find($area);
             if($area) {
                 $area->name = $data['name'];
                 $area->farm_id = $data['farm_id'];
                 $area->save();
-                return response()->json($area, 201);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json($area, 201);
+                } else {
+                    return redirect()->route('areas.index');
+                }
             } else {
                 return response()->json(['error' => 'Área no existente'], 406);
             }
@@ -131,7 +172,11 @@ class AreaController extends Controller
                     return response()->json(['conflicto' => $lct1Name], 409);
                 } else {
                     $areaLocated->delete();
-                    return response()->json(['exitoso' => 'Area: ' . $areaLocated->name . ' eliminada con éxito'], 204);
+                    if (request()->header('Content-Type') == 'application/json') {
+                        return response()->json(['exitoso' => 'Area: ' . $areaLocated->name . ' eliminada con éxito'], 204);
+                    } else {
+                        return redirect()->route('areas.index');
+                    }
                 }
             } else {
                 return response()->json(['error' => 'Area no existente'], 406);

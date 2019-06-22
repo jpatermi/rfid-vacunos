@@ -31,14 +31,14 @@
                 @endif
             </div>
             <div class="form-group col-md-8">
-              <label class="font-weight-bold" for="colostrum">Calostro (Lts):</label>
+              <label class="font-weight-bold" for="colostrum">Calostro (ml):</label>
               <input type="text" class="form-control" name="colostrum" id="colostrum" placeholder="0.00" value="{{ old('colostrum') }}">
               @if($errors->has('colostrum'))
                 <p class="text-danger"><strong>{{ $errors->first('colostrum') }}</strong></p>
               @endif
             </div>
             <div class="form-group col-md-8">
-              <label class="font-weight-bold" for="milk">Leche (Lts):</label>
+              <label class="font-weight-bold" for="milk">Leche (ml):</label>
               <input type="text" class="form-control" name="milk" id="milk" placeholder="0.00" value="{{ old('milk') }}">
               @if($errors->has('milk'))
                 <p class="text-danger"><strong>{{ $errors->first('milk') }}</strong></p>

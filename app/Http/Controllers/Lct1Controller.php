@@ -6,6 +6,7 @@ use App\Lct1;
 use Illuminate\Http\Request;
 use App\Animal;
 use App\Lct2;
+use App\Area;
 
 class Lct1Controller extends Controller
 {
@@ -16,8 +17,20 @@ class Lct1Controller extends Controller
      */
     public function index()
     {
-        $lct1s= Lct1::all()->sortBy('name')->values();
-        return response()->json($lct1s, 200);
+        $lct1s= Lct1::orderBy('area_id')->orderBy('name')->get();
+        if (request()->header('Content-Type') == 'application/json') {
+            return response()->json($lct1s, 200);
+        } else {
+            foreach ($lct1s as $lct1) {
+                $arrAreaLct1Lct2s[] = array('id'       => $lct1->id,
+                                            'name'     => $lct1->name,
+                                            'nameSup'  => $lct1->area->name);
+            }
+            $model = 'lct1s';
+            $labelAreaLct1Lct2 = 'Ubicación UNO';
+            $labelNameSup = 'Área';
+            return view('configuration.AreasLct1sLct2s.indexAreaLct1Lct2', compact('arrAreaLct1Lct2s', 'model', 'labelAreaLct1Lct2', 'labelNameSup'));
+        }
     }
 
     /**
@@ -27,7 +40,12 @@ class Lct1Controller extends Controller
      */
     public function create()
     {
-        //
+        $varComboSups = Area::all()->sortBy('name');
+        $model = 'lct1s';
+        $labelAreaLct1Lct2 = 'Ubicación UNO';
+        $labelNameSup = 'Área';
+        $fieldNameSup = 'area_id';
+        return view('configuration.AreasLct1sLct2s.createAreaLct1Lct2', compact('varComboSups', 'model', 'labelAreaLct1Lct2', 'labelNameSup', 'fieldNameSup'));
     }
 
     /**
@@ -39,12 +57,19 @@ class Lct1Controller extends Controller
     public function store(Request $request)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+                'name'      => 'required',
+                'area_id'   => 'required'
+            ]);
             $lct1 = Lct1::create([
               'name' => $data['name'],
               'area_id' => $data['area_id']
             ]);
-            return response()->json($lct1, 201);
+            if (request()->header('Content-Type') == 'application/json') {
+                return response()->json($lct1, 201);
+            } else {
+                return redirect()->route('lct1s.index');
+            }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
         }
@@ -72,9 +97,19 @@ class Lct1Controller extends Controller
      * @param  \App\Lct1  $lct1
      * @return \Illuminate\Http\Response
      */
-    public function edit(Lct1 $lct1)
+    public function edit($lct1)
     {
-        //
+        $lct1 = Lct1::find($lct1);
+        $arrAreaLct1Lct2 = array('id'       => $lct1->id,
+                                 'name'     => $lct1->name,
+                                 'idSup'    => $lct1->area->id,
+                                 'nameSup'  => $lct1->area->name);
+        $varComboSups = Area::all()->sortBy('name');
+        $model = 'lct1s';
+        $labelAreaLct1Lct2 = 'Ubicación UNO';
+        $labelNameSup = 'Área';
+        $fieldNameSup = 'area_id';
+        return view('configuration.AreasLct1sLct2s.editAreaLct1Lct2', compact('varComboSups', 'model', 'labelAreaLct1Lct2', 'labelNameSup', 'arrAreaLct1Lct2', 'fieldNameSup'));
     }
 
     /**
@@ -87,13 +122,20 @@ class Lct1Controller extends Controller
     public function update(Request $request, $lct1)
     {
         try {
-            $data = $request->json()->all();
+            $data = $request->validate([
+                'name'      => 'required',
+                'area_id'   => 'required'
+            ]);
             $lct1 = Lct1::find($lct1);
             if($lct1) {
                 $lct1->name = $data['name'];
                 $lct1->area_id = $data['area_id'];
                 $lct1->save();
-                return response()->json($lct1, 201);
+                if (request()->header('Content-Type') == 'application/json') {
+                    return response()->json($lct1, 201);
+                } else {
+                    return redirect()->route('lct1s.index');
+                }
             } else {
                 return response()->json(['error' => 'Ubicación 1 no existente'], 406);
             }
@@ -130,7 +172,11 @@ class Lct1Controller extends Controller
                     return response()->json(['conflicto' => $lct2Name], 409);
                 } else {
                     $lct1Located->delete();
-                    return response()->json(['exitoso' => 'Ubicación UNO: ' . $lct1Located->name . ' eliminada con éxito'], 204);
+                    if (request()->header('Content-Type') == 'application/json') {
+                        return response()->json(['exitoso' => 'Ubicación UNO: ' . $lct1Located->name . ' eliminada con éxito'], 204);
+                    } else {
+                        return redirect()->route('lct1s.index');
+                    }
                 }
             } else {
                 return response()->json(['error' => 'Ubicación UNO no existente'], 406);

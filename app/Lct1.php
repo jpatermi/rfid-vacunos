@@ -49,4 +49,11 @@ class Lct1 extends Model
     {
         return $this->belongsTo('App\Area');
     }
+    /**
+     * Get the comments for the animals.
+    */
+    public function lct2s()
+    {
+        return $this->hasMany('App\Lct2');
+    }
 }

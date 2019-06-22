@@ -198,6 +198,7 @@ return [
         'milk'                  => 'Leche',
         'measurement_date'      => 'Fecha Medición',
         'weight'                => 'Peso',
-        'height'                => 'Altura'
+        'height'                => 'Altura',
+        'review_date'           => 'Fecha de Revisión'
     ],
 ];

@@ -43,14 +43,14 @@
 				<div class="form-row nav justify-content-center">
 				    <div class="form-group col-md-4">
 						<label class="font-weight-bold" for="mother_rfid">RFID Madre:</label>
-						<input type="text" class="form-control" name="mother_rfid" id="mother_rfid" placeholder="0000000000" maxlength="10" minlength="10" value="{{ old('mother_rfid') }}">
+						<input type="text" class="form-control" name="mother_rfid" id="mother_rfid" placeholder="RFID o ID" maxlength="50" value="{{ old('mother_rfid') }}">
 						@if($errors->has('mother_rfid'))
 							<p class="text-danger"><strong>{{ $errors->first('mother_rfid') }}</strong></p>
 						@endif
 					</div>
 				    <div class="form-group col-md-4">
 						<label class="font-weight-bold" for="father_rfid">RFID Padre:</label>
-						<input type="text" class="form-control" name="father_rfid" id="father_rfid" placeholder="0000000000" maxlength="10" minlength="10" value="{{ old('father_rfid') }}">
+						<input type="text" class="form-control" name="father_rfid" id="father_rfid" placeholder="RFID o ID" maxlength="50" value="{{ old('father_rfid') }}">
 						@if($errors->has('father_rfid'))
 							<p class="text-danger"><strong>{{ $errors->first('father_rfid') }}</strong></p>
 						@endif
@@ -90,7 +90,7 @@
 				    </div>
 				    <div class="form-group col-md-4">
 						<label class="font-weight-bold" for="last_height">Atura (Cm):</label>
-						<input type="text" class="form-control" name="last_height" id="last_height" placeholder="000" value="{{ old('last_height') }}">
+						<input type="text" class="form-control" name="last_height" id="last_height" placeholder="000" value="{{ old('last_height', 0) }}">
 						@if($errors->has('last_height'))
 							<p class="text-danger"><strong>{{ $errors->first('last_height') }}</strong></p>
 						@endif

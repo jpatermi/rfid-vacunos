@@ -83,6 +83,9 @@
                                     <a class="dropdown-item" href="{{ route('treatments.index') }}">Tratamientos</a>
                                     <a class="dropdown-item" href="{{ route('veterinarians.index') }}">Veterinarios</a>
                                     <a class="dropdown-item" href="{{ route('responsibles.index') }}">Responsables</a>
+                                    <a class="dropdown-item" href="{{ route('areas.index') }}">Áreas</a>
+                                    <a class="dropdown-item" href="{{ route('lct1s.index') }}">Ubicaciones UNO</a>
+                                    <a class="dropdown-item" href="{{ route('lct2s.index') }}">Ubicaciones DOS</a>
                                 </div>
                             </li>
                             <li class="nav-item dropdown">

@@ -47,7 +47,7 @@ Route::group(['middleware' => ['auth.web']], function() use($router) {
 	Route::get('/animaldiseases/{animal_rfid}', ['uses'=>'DiseaseController@getAnimalDiseases'])->name('disease.GetAnimalDiseases');
 	Route::resource('diseases', 'DiseaseController');
 
-	/*** Ubicaciones ***/
+	/*** Ubicaciones por Área y Módulo***/
 	Route::get('/showbyarea/{area}', ['uses'=>'Lct1Controller@showByArea'])->name('lct1s.showByArea');
 	Route::get('/showbylct1/{lct1}', ['uses'=>'Lct2Controller@showByLct1'])->name('lct2s.showByLct1');
 
@@ -68,7 +68,11 @@ Route::group(['middleware' => ['auth.web']], function() use($router) {
 	Route::resource('treatments', 'TreatmentController');
 	Route::resource('responsibles', 'ResponsibleController');
 
-	//Route::post('/photo/{animal_rfid}', ['uses'=>'AnimalController@uploadPhoto'])->name('animals.uploadPhoto');
+	//### Ubicaciones ###
+	Route::resource('areas', 'AreaController');
+	Route::resource('farms', 'FarmController');
+	Route::resource('lct1s', 'Lct1Controller');
+	Route::resource('lct2s', 'Lct2Controller');
 
 	Route::get('/home', 'HomeController@index')->name('home')->middleware('auth.web');
 

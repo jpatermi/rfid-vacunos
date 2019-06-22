@@ -1,0 +1,2 @@
+ANIMALS:
+  Campos mother_rfid y father_rfid se amplió el VARCHAR a 50 y se le quitó el valor predeterminado
