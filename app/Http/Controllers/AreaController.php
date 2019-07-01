@@ -10,6 +10,14 @@ use App\Farm;
 
 class AreaController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:areas.index')->only('index');
+        $this->middleware('permission:areas.create')->only(['create', 'store']);
+        $this->middleware('permission:areas.show')->only('show');
+        $this->middleware('permission:areas.edit')->only(['edit', 'update']);
+        $this->middleware('permission:areas.destroy')->only('destroy');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -68,7 +76,7 @@ class AreaController extends Controller
             if (request()->header('Content-Type') == 'application/json') {
                 return response()->json($area, 201);
             } else {
-                return redirect()->route('areas.index');
+                return redirect()->route('areas.edit', $area->id)->with('info', 'Área guardada con éxito');
             }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
@@ -134,7 +142,7 @@ class AreaController extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($area, 201);
                 } else {
-                    return redirect()->route('areas.index');
+                    return redirect()->route('areas.edit', $area->id)->with('info', 'Área actualizada con éxito');
                 }
             } else {
                 return response()->json(['error' => 'Área no existente'], 406);
@@ -175,7 +183,7 @@ class AreaController extends Controller
                     if (request()->header('Content-Type') == 'application/json') {
                         return response()->json(['exitoso' => 'Area: ' . $areaLocated->name . ' eliminada con éxito'], 204);
                     } else {
-                        return redirect()->route('areas.index');
+                        return redirect()->route('areas.index')->with('info', 'Área eliminada con éxito');
                     }
                 }
             } else {

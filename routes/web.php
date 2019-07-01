@@ -47,10 +47,6 @@ Route::group(['middleware' => ['auth.web']], function() use($router) {
 	Route::get('/animaldiseases/{animal_rfid}', ['uses'=>'DiseaseController@getAnimalDiseases'])->name('disease.GetAnimalDiseases');
 	Route::resource('diseases', 'DiseaseController');
 
-	/*** Ubicaciones por Área y Módulo***/
-	Route::get('/showbyarea/{area}', ['uses'=>'Lct1Controller@showByArea'])->name('lct1s.showByArea');
-	Route::get('/showbylct1/{lct1}', ['uses'=>'Lct2Controller@showByLct1'])->name('lct2s.showByLct1');
-
 	// ### Producción del Animal ###
 	Route::resource('productions', 'ProductionController');
 
@@ -74,6 +70,14 @@ Route::group(['middleware' => ['auth.web']], function() use($router) {
 	Route::resource('lct1s', 'Lct1Controller');
 	Route::resource('lct2s', 'Lct2Controller');
 
+	//### Users ###
+	Route::resource('users', 'UsersController');
+
+	/*** Ubicaciones por Área y Módulo***/
+	Route::get('/showbyarea/{area}', ['uses'=>'Lct1Controller@showByArea'])->name('lct1s.showByArea');
+	Route::get('/showbylct1/{lct1}', ['uses'=>'Lct2Controller@showByLct1'])->name('lct2s.showByLct1');
+
+	//### Home ###
 	Route::get('/home', 'HomeController@index')->name('home')->middleware('auth.web');
 
 	//### Inventario ###

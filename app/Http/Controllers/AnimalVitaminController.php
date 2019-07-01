@@ -61,7 +61,7 @@ class AnimalVitaminController extends Controller
                     if (request()->header('Content-Type') == 'application/json') {
                         return response()->json($anivit, 201);
                     } else {
-                        return redirect()->route('animalvitamin.show', $anivit->animal_id);
+                        return redirect()->route('animalvitamin.show', $anivit->animal_id)->with('info', 'Aplicación guardada con éxito');
                     }
                 } else {
                     return response()->json(['error' => 'El Animal: ' . $animal->animal_rfid . ' ya tiene la Vitamina: ' . $anivit->name . ' de fecha: ' . $anivit->pivot->application_date->format('d/m/Y')], 406);
@@ -178,7 +178,7 @@ class AnimalVitaminController extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($anivit, 201);
                 } else {
-                    return redirect()->route('animalvitamin.show', $anivit->animal_id);
+                    return redirect()->route('animalvitamin.show', $anivit->animal_id)->with('info', 'Aplicación actualizada con éxito');
                 }
             } else {
                 return response()->json(['error' => 'Aplicación de Vitamina no existente'], 406);
@@ -203,7 +203,7 @@ class AnimalVitaminController extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json(['exitoso' => 'Aplicación eliminada con éxito'], 204);
                 } else {
-                    return redirect()->route('animalvitamin.show', $anivit->animal_id);
+                    return redirect()->route('animalvitamin.show', $anivit->animal_id)->with('info', 'Aplicación eliminada con éxito');
                 }
             } else {
                 return response()->json(['error' => 'Aplicación de Vitamina no existente'], 406);

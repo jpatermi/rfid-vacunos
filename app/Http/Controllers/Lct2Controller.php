@@ -10,6 +10,14 @@ use App\Animal;
 
 class Lct2Controller extends Controller
 {
+     public function __construct()
+    {
+        $this->middleware('permission:lct2s.index')->only('index');
+        $this->middleware('permission:lct2s.create')->only(['create', 'store']);
+        $this->middleware('permission:lct2s.show')->only('show');
+        $this->middleware('permission:lct2s.edit')->only(['edit', 'update']);
+        $this->middleware('permission:lct2s.destroy')->only('destroy');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -85,7 +93,7 @@ class Lct2Controller extends Controller
             if (request()->header('Content-Type') == 'application/json') {
                 return response()->json($lct2, 201);
             } else {
-                return redirect()->route('lct2s.index');
+                return redirect()->route('lct2s.edit', $lct2->id)->with('info', 'Ubicación DOS guardada con éxito');
             }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
@@ -158,7 +166,7 @@ class Lct2Controller extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($lct2, 201);
                 } else {
-                    return redirect()->route('lct2s.index');
+                    return redirect()->route('lct2s.edit', $lct2->id)->with('info', 'Ubicación DOS actualizada con éxito');
                 }
             } else {
                 return response()->json(['error' => 'Ubicación 2 no existente'], 406);
@@ -191,7 +199,7 @@ class Lct2Controller extends Controller
                     if (request()->header('Content-Type') == 'application/json') {
                         return response()->json(['exitoso' => 'Ubicación UNO: ' . $lct2Located->name . ' eliminada con éxito'], 204);
                     } else {
-                        return redirect()->route('lct2s.index');
+                        return redirect()->route('lct2s.index')->with('info', 'Ubicación DOS eliminada con éxito');
                     }
                 }
             } else {

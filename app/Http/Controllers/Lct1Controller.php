@@ -10,6 +10,14 @@ use App\Area;
 
 class Lct1Controller extends Controller
 {
+     public function __construct()
+    {
+        $this->middleware('permission:lct1s.index')->only('index');
+        $this->middleware('permission:lct1s.create')->only(['create', 'store']);
+        $this->middleware('permission:lct1s.show')->only('show');
+        $this->middleware('permission:lct1s.edit')->only(['edit', 'update']);
+        $this->middleware('permission:lct1s.destroy')->only('destroy');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -68,7 +76,7 @@ class Lct1Controller extends Controller
             if (request()->header('Content-Type') == 'application/json') {
                 return response()->json($lct1, 201);
             } else {
-                return redirect()->route('lct1s.index');
+                return redirect()->route('lct1s.edit', $lct1->id)->with('info', 'Ubicación UNO guardada con éxito');
             }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
@@ -134,7 +142,7 @@ class Lct1Controller extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($lct1, 201);
                 } else {
-                    return redirect()->route('lct1s.index');
+                    return redirect()->route('lct1s.edit', $lct1->id)->with('info', 'Ubicación UNO actualizada con éxito');
                 }
             } else {
                 return response()->json(['error' => 'Ubicación 1 no existente'], 406);
@@ -175,7 +183,7 @@ class Lct1Controller extends Controller
                     if (request()->header('Content-Type') == 'application/json') {
                         return response()->json(['exitoso' => 'Ubicación UNO: ' . $lct1Located->name . ' eliminada con éxito'], 204);
                     } else {
-                        return redirect()->route('lct1s.index');
+                        return redirect()->route('lct1s.index')->with('info', 'Ubicación UNO eliminada con éxito');
                     }
                 }
             } else {

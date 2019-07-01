@@ -8,6 +8,14 @@ use App\Disease;
 
 class ResponsibleController extends Controller
 {
+     public function __construct()
+    {
+        $this->middleware('permission:responsibles.index')->only('index');
+        $this->middleware('permission:responsibles.create')->only(['create', 'store']);
+        $this->middleware('permission:responsibles.show')->only('show');
+        $this->middleware('permission:responsibles.edit')->only(['edit', 'update']);
+        $this->middleware('permission:responsibles.destroy')->only('destroy');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -56,7 +64,7 @@ class ResponsibleController extends Controller
             if (request()->header('Content-Type') == 'application/json') {
                 return response()->json($responsible, 201);
             } else {
-                return redirect()->route('responsibles.index');
+                return redirect()->route('responsibles.edit', $responsible->id)->with('info', 'Responsable guardado con éxito');
             }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
@@ -113,7 +121,7 @@ class ResponsibleController extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($responsible, 201);
                 } else {
-                    return redirect()->route('responsibles.index');
+                    return redirect()->route('responsibles.edit', $responsible->id)->with('info', 'Responsable actualizado con éxito');
                 }
             } else {
                 return response()->json(['error' => 'Responsable no existente'], 406);
@@ -146,7 +154,7 @@ class ResponsibleController extends Controller
                     if (request()->header('Content-Type') == 'application/json') {
                         return response()->json(['exitoso' => 'Responsable: ' . $responsibleLocated->name . ' eliminado con éxito'], 204);
                     } else {
-                        return redirect()->route('responsibles.index');
+                        return redirect()->route('responsibles.index')->with('info', 'Responsable eliminado con éxito');
                     }
                 }
             } else {

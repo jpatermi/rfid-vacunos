@@ -7,6 +7,14 @@ use Illuminate\Http\Request;
 
 class TreatmentController extends Controller
 {
+     public function __construct()
+    {
+        $this->middleware('permission:treatments.index')->only('index');
+        $this->middleware('permission:treatments.create')->only(['create', 'store']);
+        $this->middleware('permission:treatments.show')->only('show');
+        $this->middleware('permission:treatments.edit')->only(['edit', 'update']);
+        $this->middleware('permission:treatments.destroy')->only('destroy');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -55,7 +63,7 @@ class TreatmentController extends Controller
             if (request()->header('Content-Type') == 'application/json') {
                 return response()->json($treatment, 201);
             } else {
-                return redirect()->route('treatments.index');
+                return redirect()->route('treatments.edit', $treatment->id)->with('info', 'Tratamiento guardado con éxito');
             }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
@@ -112,7 +120,7 @@ class TreatmentController extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($treatment, 201);
                 } else {
-                    return redirect()->route('treatments.index');
+                    return redirect()->route('treatments.edit', $treatment->id)->with('info', 'Tratamiento actualizado con éxito');
                 }
             } else {
                 return response()->json(['error' => 'Tratamiento no existente'], 406);
@@ -145,7 +153,7 @@ class TreatmentController extends Controller
                     if (request()->header('Content-Type') == 'application/json') {
                         return response()->json(['exitoso' => 'Tratamiento: ' . $treatmentLocated->name . ' eliminado con éxito'], 204);
                     } else {
-                        return redirect()->route('treatments.index');
+                        return redirect()->route('treatments.index')->with('info', 'Tratamiento eliminado con éxito');
                     }
                 }
             } else {

@@ -31,8 +31,7 @@
                                 </tr>
                             @endforeach
                         </table>
-                    </div>
-                    <div style="height: 63px;"></div>
+                    <!--<div style="height: 63px;"></div>-->
                 </div>
                 {{--<div class="text-right pb-2 pr-2">
                     <div>
@@ -40,6 +39,7 @@
                         </a>
                     </div>
                 </div>--}}
+            </div>
             </div>
         </div>
         <div class="col-md-6 mb-1">

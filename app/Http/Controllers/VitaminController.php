@@ -8,6 +8,14 @@ use Barryvdh\DomPDF\Facade as PDF;
 
 class VitaminController extends Controller
 {
+     public function __construct()
+    {
+        $this->middleware('permission:vitamins.index')->only('index');
+        $this->middleware('permission:vitamins.create')->only(['create', 'store']);
+        $this->middleware('permission:vitamins.show')->only('show');
+        $this->middleware('permission:vitamins.edit')->only(['edit', 'update']);
+        $this->middleware('permission:vitamins.destroy')->only('destroy');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -58,7 +66,7 @@ class VitaminController extends Controller
             if (request()->header('Content-Type') == 'application/json') {
                 return response()->json($vitamin, 201);
             } else {
-                return redirect()->route('vitamins.index');
+                return redirect()->route('vitamins.edit', $vitamin->id)->with('info', 'Vitamina guardada con éxito');
             }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
@@ -117,7 +125,7 @@ class VitaminController extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($vitamin, 201);
                 } else {
-                    return redirect()->route('vitamins.index');
+                    return redirect()->route('vitamins.edit', $vitamin->id)->with('info', 'Vitamina actualizada con éxito');
                 }
             } else {
                 return response()->json(['error' => 'Vitamina no existente'], 406);
@@ -150,7 +158,7 @@ class VitaminController extends Controller
                     if (request()->header('Content-Type') == 'application/json') {
                         return response()->json(['exitoso' => 'Vitamina: ' . $vitamin->name . ' eliminada con éxito'], 204);
                     } else {
-                        return redirect()->route('vitamins.index');
+                        return redirect()->route('vitamins.index')->with('info', 'Vitamina eliminada con éxito');
                     }
                 }
             } else {

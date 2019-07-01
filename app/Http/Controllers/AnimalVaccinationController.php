@@ -26,14 +26,8 @@ class AnimalVaccinationController extends Controller
      */
     public function create(Request $request)
     {
-/*        $animal_id = $request->all();
-        $animal = Animal::find($animal_id)->first();
-        $vaccinations = Vaccination::orderBy('name')->get();
-        //dd($animal, $vaccinations);
-        $model = 'animalvaccination';
-        $title = 'Aplicación de Vacuna';
-        return view('animalVaccinations.createAnimalVaccination', compact('animal', 'model', 'title', 'vaccinations'));
-*/    }
+        //
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -68,7 +62,7 @@ class AnimalVaccinationController extends Controller
                     if (request()->header('Content-Type') == 'application/json') {
                         return response()->json($anivac, 201);
                     } else {
-                        return redirect()->route('animalvaccination.show', $anivac->animal_id);
+                        return redirect()->route('animalvaccination.show', $anivac->animal_id)->with('info', 'Aplicación guardada con éxito');
                     }
                 } else {
                     return response()->json(['error' => 'El Animal: ' . $animal->animal_rfid . ' ya tiene la vacuna: ' . $anivac->name . ' de fecha: ' . $anivac->pivot->application_date->format('d/m/Y')], 406);
@@ -228,7 +222,7 @@ class AnimalVaccinationController extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($anivac, 201);
                 } else {
-                    return redirect()->route('animalvaccination.show', $anivac->animal_id);
+                    return redirect()->route('animalvaccination.show', $anivac->animal_id)->with('info', 'Aplicación actualizada con éxito');
                 }
             } else {
                 return response()->json(['error' => 'Aplicación de Vacuna no existente'], 406);
@@ -253,7 +247,7 @@ class AnimalVaccinationController extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json(['exitoso' => 'Aplicación eliminada con éxito'], 204);
                 } else {
-                    return redirect()->route('animalvaccination.show', $anivac->animal_id);
+                    return redirect()->route('animalvaccination.show', $anivac->animal_id)->with('info', 'Aplicación eliminada con éxito');
                 }
             } else {
                 return response()->json(['error' => 'Aplicación de Vacuna no existente'], 406);

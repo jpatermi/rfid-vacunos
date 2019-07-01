@@ -54,7 +54,7 @@ class PhysicalCharacteristicController extends Controller
                 }
                 else
                 {
-                    return redirect()->route('animals.show', $animal->animal_rfid);
+                    return redirect()->route('animals.show', $animal->animal_rfid)->with('info', 'Característica guardada con éxito');
                 }
             } else {
                 return response()->json(['error' => 'Animal no existente'], 406);
@@ -149,7 +149,7 @@ class PhysicalCharacteristicController extends Controller
                 }
                 else
                 {
-                    return redirect()->route('animals.show', $physicalCharacteristic->animal->animal_rfid);
+                    return redirect()->route('animals.show', $physicalCharacteristic->animal->animal_rfid)->with('info', 'Característica eliminada con éxito');
                 }
             } else {
                 return response()->json(['error' => 'Característica no existente'], 406);

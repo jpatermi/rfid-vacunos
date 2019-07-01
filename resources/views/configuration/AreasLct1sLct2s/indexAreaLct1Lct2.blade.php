@@ -6,8 +6,9 @@
         <div class="d-flex justify-content-between align-items-end p-2">
             <h2>Listado de {{ $labelAreaLct1Lct2 }}</h2>
             <div>
-              <a class="btn btn-primary mb-2" href="{{ route($model . '.create') }}">Agregar {{ $labelAreaLct1Lct2 }}</a>
-              {{--<a href="{{ route('animals.index') }}" class="btn-link btn pb-3">Regresar al listado de Animales</a>--}}
+              @can($model . '.create')
+                <a class="btn btn-primary mb-2" href="{{ route($model . '.create') }}">Agregar {{ $labelAreaLct1Lct2 }}</a>
+              @endcan
             </div>
         </div>
       </div>
@@ -36,12 +37,16 @@
                       <form action="{{ route($model . '.destroy', $arrAreaLct1Lct2['id']) }}" method="POST">
                           {{ method_field('DELETE') }}
                           @csrf
-                          <a href="{{ route($model . '.edit', $arrAreaLct1Lct2['id']) }}" class="btn btn-link text-primary">
-                              <span data-toggle="tooltip" data-placement="top" title="Editar {{ $labelAreaLct1Lct2 }}" ><img class="" src="{{ asset('img/ico/baseline-edit-24px.svg') }}" alt="Editar"></span>
-                          </a>
-                          <button type="submit" class="btn btn-link text-primary" onclick="return confirm('¿Esta seguro de eliminar la {{ $labelAreaLct1Lct2 }}: {{ $arrAreaLct1Lct2['name'] }}?')">
-                              <span data-toggle="tooltip" data-placement="top" title="Eliminar {{ $labelAreaLct1Lct2 }}"><img class="" src="{{ asset('img/ico/baseline-delete-24px.svg') }}" alt="Eliminar"></span>
-                          </button>
+                          @can($model . '.edit')
+                            <a href="{{ route($model . '.edit', $arrAreaLct1Lct2['id']) }}" class="btn btn-link text-primary">
+                                <span data-toggle="tooltip" data-placement="top" title="Editar {{ $labelAreaLct1Lct2 }}" ><img class="" src="{{ asset('img/ico/baseline-edit-24px.svg') }}" alt="Editar"></span>
+                            </a>
+                          @endcan
+                          @can($model . '.destroy')
+                            <button type="submit" class="btn btn-link text-primary" onclick="return confirm('¿Esta seguro de eliminar la {{ $labelAreaLct1Lct2 }}: {{ $arrAreaLct1Lct2['name'] }}?')">
+                                <span data-toggle="tooltip" data-placement="top" title="Eliminar {{ $labelAreaLct1Lct2 }}"><img class="" src="{{ asset('img/ico/baseline-delete-24px.svg') }}" alt="Eliminar"></span>
+                            </button>
+                          @endcan
                       </form>
                   </td>
               </tr>

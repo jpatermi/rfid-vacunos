@@ -29,6 +29,7 @@
               <p class="text-danger"><strong>{{ $errors->first('vaccination_id') }}</strong></p>
             @endif
           </div>
+
           <div class="form-group" @if($label == 'Examen') hidden @endif>
             <label class="font-weight-bold" for="dose">Dosis (cc):</label>
             <input type="text" class="form-control" name="dose" id="dose" placeholder="00.00" value="{{ old('dose') }}">
@@ -36,6 +37,7 @@
               <p class="text-danger"><strong>{{ $errors->first('dose') }}</strong></p>
             @endif
           </div>
+
           <div class="form-group">
               <label class="font-weight-bold" for="dateface">Fecha de aplicación:</label>
               <div class="input-group date">
@@ -46,6 +48,7 @@
                 <p class="text-danger"><strong>{{ $errors->first('application_date') }}</strong></p>
               @endif
           </div>
+
           <!-- Textos ocultos que  vendrán en la sesión para el user_id y el farm_id -->
           <input type="text" name="animal_id" id="animal_id" hidden value="{{ old('animal_id', $animal->id) }}">
           <input type="text" name="application_date" id="application_date" hidden value="{{ old('application_date') }}">

@@ -68,14 +68,14 @@ class AnimalController extends Controller
             global $data, $animal;
             $data = $request->validate([
                 //'animal_rfid'   => 'required|unique:animals|max:10|min:10', //TODO Revisar el unique (son 2 campos)
-                'animal_rfid'   => 'required|max:10|min:10',
+                'animal_rfid'   => 'required|max:10|min:10|regex:/(^([0-9]+)(\d+)?$)/u',
                 'gender'        => 'required|max:1',
                 'birthdate'     => 'required|date|max:10',
                 'breed_id'      => 'required',
                 'mother_rfid'   => '',
                 'father_rfid'   => '',
-                'last_weight'   => 'required',
-                'last_height'   => '',
+                'last_weight'   => 'required|numeric',
+                'last_height'   => 'numeric',
                 'age_group_id'  => 'required',
                 'farm_id'       => 'required',
                 'area_id'       => 'required',
@@ -84,7 +84,6 @@ class AnimalController extends Controller
                 'user_id'       => 'required',
             ]);
 
-            //$data = $request->json()->all();
             $animal = Animal::where('animal_rfid', $data['animal_rfid'])->get();
             if ($animal->isEmpty())
             {
@@ -133,7 +132,7 @@ class AnimalController extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($animal, 201);
                 } else {
-                    return redirect()->route('animals.index');
+                    return redirect()->route('animals.show', $animal->animal_rfid)->with('info', 'Animal guardado con éxito');
                 }
             }
             else
@@ -164,7 +163,13 @@ class AnimalController extends Controller
                 $animal->lct1;
                 $animal->lct2;
                 $animal->agegroup;
-                $animal->physicalCharacteristics;
+                $animal->physicalCharacteristics->sortBy('created_at');
+                foreach ($animal->animalLocations as $animalLocation) {
+                  $animalLocation->farm;
+                  $animalLocation->area;
+                  $animalLocation->lct1;
+                  $animalLocation->lct2;
+                }
                 $i=0;
                 //Cache::flush();
                 //Cache::pull('photo');
@@ -213,8 +218,8 @@ class AnimalController extends Controller
                 'gender'        => 'required|max:1',
                 'birthdate'     => 'required|date|max:10',
                 'breed_id'      => 'required',
-                'mother_rfid'   => 'required|max:10|min:10',
-                'father_rfid'   => 'required|max:10|min:10',
+                'mother_rfid'   => '',
+                'father_rfid'   => '',
                 'last_weight'   => 'required',
                 'last_height'   => 'required',
                 'age_group_id'  => 'required',
@@ -273,7 +278,7 @@ class AnimalController extends Controller
                         $animalLocated->photo = true;
                         $animalLocated->save();
                         Cache::flush();
-                        //Cache::pull('photo');
+                        Cache::pull('photo');
                     }
                     // else
                     // {
@@ -286,7 +291,7 @@ class AnimalController extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($animalLocated, 201);
                 } else {
-                    return redirect()->route('animals.index');
+                    return redirect()->route('animals.show', $animal->animal_rfid)->with('info', 'Animal actualizado con éxito');
                 }
             }
             else
@@ -335,7 +340,7 @@ class AnimalController extends Controller
             if (request()->header('Content-Type') == 'application/json') {
                 return response()->json(['exitoso' => 'Animal: ' . $animal->animal_rfid . ' eliminado con éxito'], 204);
             } else {
-                return redirect()->route('animals.index');
+                return redirect()->route('animals.index')->with('info', 'Animal eliminado con éxito');
             }
         } else {
             return response()->json(['error' => 'Animal no existente'], 406);

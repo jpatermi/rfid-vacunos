@@ -72,20 +72,51 @@
                                   Configuración
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                    <a class="dropdown-item" href="{{ route('vaccinations.index') }}">Vacunas</a>
-                                    <a class="dropdown-item" href="{{ route('dewormers.index') }}">Desparasitaciones</a>
-                                    <a class="dropdown-item" href="{{ route('vitamins.index') }}">Vitaminas</a>
-                                    <a class="dropdown-item" href="{{ route('examns.index') }}">Exámenes</a>
-                                    <a class="dropdown-item" href="{{ route('breeds.index') }}">Razas</a>
-                                    <a class="dropdown-item" href="{{ route('agegroups.index') }}">Grupos Etarios</a>
-                                    <a class="dropdown-item" href="{{ route('diagnostics.index') }}">Diagnósticos</a>
-                                    <a class="dropdown-item" href="{{ route('causes.index') }}">Causas</a>
-                                    <a class="dropdown-item" href="{{ route('treatments.index') }}">Tratamientos</a>
-                                    <a class="dropdown-item" href="{{ route('veterinarians.index') }}">Veterinarios</a>
-                                    <a class="dropdown-item" href="{{ route('responsibles.index') }}">Responsables</a>
-                                    <a class="dropdown-item" href="{{ route('areas.index') }}">Áreas</a>
-                                    <a class="dropdown-item" href="{{ route('lct1s.index') }}">Ubicaciones UNO</a>
-                                    <a class="dropdown-item" href="{{ route('lct2s.index') }}">Ubicaciones DOS</a>
+                                    @can('vaccinations.index')
+                                        <a class="dropdown-item" href="{{ route('vaccinations.index') }}">Vacunas</a>
+                                    @endcan
+                                    @can('dewormers.index')
+                                        <a class="dropdown-item" href="{{ route('dewormers.index') }}">Desparasitaciones</a>
+                                    @endcan
+                                    @can('vitamins.index')
+                                        <a class="dropdown-item" href="{{ route('vitamins.index') }}">Vitaminas</a>
+                                    @endcan
+                                    @can('examns.index')
+                                        <a class="dropdown-item" href="{{ route('examns.index') }}">Exámenes</a>
+                                    @endcan
+                                    @can('breeds.index')
+                                        <a class="dropdown-item" href="{{ route('breeds.index') }}">Razas</a>
+                                    @endcan
+                                    @can('agegroups.index')
+                                        <a class="dropdown-item" href="{{ route('agegroups.index') }}">Grupos Etarios</a>
+                                    @endcan
+                                    @can('diagnostics.index')
+                                        <a class="dropdown-item" href="{{ route('diagnostics.index') }}">Diagnósticos</a>
+                                    @endcan
+                                    @can('causes.index')
+                                        <a class="dropdown-item" href="{{ route('causes.index') }}">Causas</a>
+                                    @endcan
+                                    @can('treatments.index')
+                                        <a class="dropdown-item" href="{{ route('treatments.index') }}">Tratamientos</a>
+                                    @endcan
+                                    @can('veterinarians.index')
+                                        <a class="dropdown-item" href="{{ route('veterinarians.index') }}">Veterinarios</a>
+                                    @endcan
+                                    @can('responsibles.index')
+                                        <a class="dropdown-item" href="{{ route('responsibles.index') }}">Responsables</a>
+                                    @endcan
+                                    @can('areas.index')
+                                        <a class="dropdown-item" href="{{ route('areas.index') }}">Áreas</a>
+                                    @endcan
+                                    @can('lct1s.index')
+                                        <a class="dropdown-item" href="{{ route('lct1s.index') }}">Ubicaciones UNO</a>
+                                    @endcan
+                                    @can('lct2s.index')
+                                        <a class="dropdown-item" href="{{ route('lct2s.index') }}">Ubicaciones DOS</a>
+                                    @endcan
+                                    @can('users.index')
+                                        <a class="dropdown-item" href="{{ route('users.index') }}">Usuarios</a>
+                                    @endcan
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
@@ -112,6 +143,28 @@
         </nav>
 
         <main class="container py-4 mt-5">
+            @if(session('info'))
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="alert alert-success text-center">
+                            <h5 class="font-weight-bold">{{ session('info') }}
+                                <span><img class="ml-2" src="{{ asset('img/ico/baseline-done-24px.svg') }}" alt="Hecho"></span>
+                            </h5>
+                        </div>
+                    </div>
+                </div>
+            @elseif(session('warning'))
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="alert alert-danger text-center">
+                            <h5 class="font-weight-bold">{{ session('warning') }}
+                                <span><img class="ml-2" src="{{ asset('img/ico/baseline-warning-24px.svg') }}" alt="Advertencia"></span>
+                            </h5>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             @yield('content')
         </main>
     </div>

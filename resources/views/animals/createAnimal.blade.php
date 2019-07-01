@@ -3,6 +3,7 @@
 	<div class="card">
 		<h4 class="card-header font-weight-bold text-center">Agregar Animal</h4>
 		<div class="card-body">
+
 			@if($errors->any())
 				<div class="alert alert-danger text-center">
 					<h6 class="font-weight-bold">Por favor corregir los errores abajo señalados:</h6>
@@ -20,7 +21,9 @@
 						@endif
 					</div>
 				</div>
+
 				<hr class="pb-4">
+
 				<div class="form-row nav justify-content-center">
 					<div class="form-group col-md-4">
 				    	<label class="font-weight-bold" for="gender">Género:</label>
@@ -40,6 +43,7 @@
 						@endif
 	                </div>
 				</div>
+
 				<div class="form-row nav justify-content-center">
 				    <div class="form-group col-md-4">
 						<label class="font-weight-bold" for="mother_rfid">RFID Madre:</label>
@@ -56,6 +60,7 @@
 						@endif
 				    </div>
 				</div>
+
 				<div class="form-row nav justify-content-center">
 					<div class="form-group col-md-4">
 				    	<label class="font-weight-bold" for="breed_id">Raza:</label>
@@ -80,6 +85,7 @@
 						@endif
 					</div>
 				</div>
+
 				<div class="form-row nav justify-content-center">
 				    <div class="form-group col-md-4">
 						<label class="font-weight-bold" for="last_weight">Peso (Kg):</label>
@@ -96,6 +102,7 @@
 						@endif
 				    </div>
 				</div>
+
 				<div class="form-row nav justify-content-center">
 					<div class="form-group col-md-4">
 				    	<label class="font-weight-bold" for="area_id">Área:</label>
@@ -109,6 +116,7 @@
 						@endif
 				    </div>
 				</div>
+
 				<div class="form-row nav justify-content-center">
 					<div class="form-group col-md-4">
 				    	<label class="font-weight-bold" for="lct1_id">Ubicación UNO:</label>
@@ -127,11 +135,13 @@
 						@endif
 					</div>
 				</div>
+
 				<!-- Textos ocultos que  vendrán en la sesión para el user_id y el farm_id -->
 				<input type="text" name="farm_id" id="farm_id" hidden value=1>
-				<input type="text" name="user_id" id="user_id" hidden value=2>
+				<input type="text" name="user_id" id="user_id" hidden value="{{ session('user_id') }}">
 				<input type="text" name="birthdate" id="birthdate" hidden value="{{ old('birthdate') }}">
 				<!-- -->
+
 				<div class="nav justify-content-center">
 			  		<button type="submit" class="col-md-2 btn btn-primary">Agregar Animal</button>
 				</div>
@@ -142,6 +152,7 @@
 		</div>
 	</div>
 @endsection
+
 @section('scripts')
     <script>
 		$.when( $.ready ).then(function() {

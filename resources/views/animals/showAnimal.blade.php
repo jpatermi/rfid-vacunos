@@ -29,6 +29,7 @@
 	                        </div>
 	                    </li>
 	                    <a class="nav-item nav-link active text-primary" href="{{ route('productions.show', $animal) }}">Registro de Producción</a>
+	                    <a href="#" class="nav-item nav-link active text-primary" data-toggle="modal" data-target="#animalLocations">Histórico de Ubicaciones</a>
 	                    <div class="ml-5">
 	                    	<a href="{{ route('animals.index') }}" class="btn btn-link text-info">Regresar al listado de Animales</a>
 	                    </div>
@@ -72,7 +73,7 @@
 				<div class="form-group col-md-4">
                     <label class="font-weight-bold" for="dateface">Fecha de nacimiento:</label>
                     <div class="input-group date">
-                        <input type="text" class="form-control" name="dateface" id="dateface" value="{{ $animal->birthdate }}" readonly>
+                        <input type="text" class="form-control" name="dateface" id="dateface" value="{{ $animal->birthdate->format('d/m/Y') }}" readonly>
                           <img class="input-group-addon" src="{{ asset('img/ico/baseline-calendar_today-24px.svg') }}" alt="Calendario">
                     </div>
                 </div>
@@ -138,8 +139,9 @@
 		</div>
 	</div>
 @include('physicalCharacteristics.showPhysicalCharacteristics')
+@include('animalLocations.showAnimalLocations')
 @endsection
-@section('scripts')
+{{--@section('scripts')
     <script>
 		$.when( $.ready ).then(function() {
           $( "#dateface" ).attr( "value", convertDateFormatUSA_to_VZLA(`${dateface.value}`));
@@ -150,4 +152,4 @@
           return info[2] + '/' + info[1] + '/' + info[0];
         };
     </script>
-@endsection
+@endsection--}}

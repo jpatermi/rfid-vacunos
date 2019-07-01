@@ -59,7 +59,7 @@ class AnimalExamnController extends Controller
                     if (request()->header('Content-Type') == 'application/json') {
                         return response()->json($aniexam, 201);
                     } else {
-                        return redirect()->route('animalexamn.show', $aniexam->animal_id);
+                        return redirect()->route('animalexamn.show', $aniexam->animal_id)->with('info', 'Aplicación guardada con éxito');
                     }
                 } else {
                     return response()->json(['error' => 'El Animal: ' . $animal->animal_rfid . ' ya tiene el Examen: ' . $aniexam->name . ' de fecha: ' . $aniexam->pivot->application_date->format('d/m/Y')], 406);
@@ -167,7 +167,7 @@ class AnimalExamnController extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($aniexam, 201);
                 } else {
-                    return redirect()->route('animalexamn.show', $aniexam->animal_id);
+                    return redirect()->route('animalexamn.show', $aniexam->animal_id)->with('info', 'Aplicación actualizada con éxito');
                 }
             } else {
                 return response()->json(['error' => 'Aplicación de Examen no existente'], 406);
@@ -192,7 +192,7 @@ class AnimalExamnController extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json(['exitoso' => 'Aplicación eliminada con éxito'], 204);
                 } else {
-                    return redirect()->route('animalexamn.show', $aniexam->animal_id);
+                    return redirect()->route('animalexamn.show', $aniexam->animal_id)->with('info', 'Aplicación eliminada con éxito');
                 }
             } else {
                 return response()->json(['error' => 'Aplicación de Examen no existente'], 406);

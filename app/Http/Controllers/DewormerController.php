@@ -8,6 +8,14 @@ use Barryvdh\DomPDF\Facade as PDF;
 
 class DewormerController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:dewormers.index')->only('index');
+        $this->middleware('permission:dewormers.create')->only(['create', 'store']);
+        $this->middleware('permission:dewormers.show')->only('show');
+        $this->middleware('permission:dewormers.edit')->only(['edit', 'update']);
+        $this->middleware('permission:dewormers.destroy')->only('destroy');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -58,7 +66,7 @@ class DewormerController extends Controller
             if (request()->header('Content-Type') == 'application/json') {
                 return response()->json($dewormer, 201);
             } else {
-                return redirect()->route('dewormers.index');
+                return redirect()->route('dewormers.edit', $dewormer->id)->with('info', 'Desparasitante guardado con éxito');
             }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
@@ -117,7 +125,7 @@ class DewormerController extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($dewormer, 201);
                 } else {
-                    return redirect()->route('dewormers.index');
+                    return redirect()->route('dewormers.edit', $dewormer->id)->with('info', 'Desparasitante actualizado con éxito');
                 }
             } else {
                 return response()->json(['error' => 'Desparasitante no existente'], 406);
@@ -150,7 +158,7 @@ class DewormerController extends Controller
                     if (request()->header('Content-Type') == 'application/json') {
                         return response()->json(['exitoso' => 'Desparasitante: ' . $dewormer->name . ' eliminada con éxito'], 204);
                     } else {
-                        return redirect()->route('dewormers.index');
+                        return redirect()->route('dewormers.index')->with('info', 'Desparasitante eliminado con éxito');
                     }
                 }
             } else {

@@ -53,6 +53,7 @@ class Animal extends Model
 /*        'created_at',
         'updated_at',*/
         'deleted_at',
+        'birthdate',
     ];
     //protected $dateFormat = 'd-m-Y H:i:s';
 

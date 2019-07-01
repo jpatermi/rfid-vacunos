@@ -162,7 +162,7 @@ class DiseaseController extends Controller
                               }
                               $disease->treatments;
                           });
-                          return redirect()->route('disease.GetAnimalDiseases', $animal->id);
+                          return redirect()->route('diseases.edit', $disease->id)->with('info', 'Enfermedad guardada con éxito');
                       }
                       else
                       {
@@ -439,7 +439,7 @@ class DiseaseController extends Controller
                       }
                       $diseaseLocated->treatments;
                   });
-                  return redirect()->route('disease.GetAnimalDiseases', $diseaseLocated->animal_id);
+                  return redirect()->route('diseases.edit', $diseaseLocated->id)->with('info', 'Enfermedad actualizada con éxito');
               }
               else
               {
@@ -474,7 +474,7 @@ class DiseaseController extends Controller
             if (request()->header('Content-Type') == 'application/json') {
               return response()->json(['exitoso' => 'Enfermedad eliminada con éxito'], 204);
             } else {
-              return redirect()->route('disease.GetAnimalDiseases', $disease->animal_id);
+              return redirect()->route('disease.GetAnimalDiseases', $disease->animal_id)->with('info', 'Enfermedad eliminada con éxito');
             }
         }
         else

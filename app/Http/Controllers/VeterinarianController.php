@@ -8,6 +8,14 @@ use App\Disease;
 
 class VeterinarianController extends Controller
 {
+     public function __construct()
+    {
+        $this->middleware('permission:veterinarians.index')->only('index');
+        $this->middleware('permission:veterinarians.create')->only(['create', 'store']);
+        $this->middleware('permission:veterinarians.show')->only('show');
+        $this->middleware('permission:veterinarians.edit')->only(['edit', 'update']);
+        $this->middleware('permission:veterinarians.destroy')->only('destroy');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -56,7 +64,7 @@ class VeterinarianController extends Controller
             if (request()->header('Content-Type') == 'application/json') {
                 return response()->json($veterinarian, 201);
             } else {
-                return redirect()->route('veterinarians.index');
+                return redirect()->route('veterinarians.edit', $veterinarian->id)->with('info', 'Veterinario guardado con éxito');
             }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
@@ -113,7 +121,7 @@ class VeterinarianController extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($veterinarian, 201);
                 } else {
-                    return redirect()->route('veterinarians.index');
+                    return redirect()->route('veterinarians.edit', $veterinarian->id)->with('info', 'Veterinario actualizado con éxito');
                 }
             } else {
                 return response()->json(['error' => 'Veterinario no existente'], 406);
@@ -146,7 +154,7 @@ class VeterinarianController extends Controller
                     if (request()->header('Content-Type') == 'application/json') {
                         return response()->json(['exitoso' => 'Veterinario: ' . $veterinarianLocated->name . ' eliminado con éxito'], 204);
                     } else {
-                        return redirect()->route('veterinarians.index');
+                        return redirect()->route('veterinarians.index')->with('info', 'Veterinario eliminado con éxito');
                     }
                 }
             } else {

@@ -8,6 +8,14 @@ use Barryvdh\DomPDF\Facade as PDF;
 
 class ExamnController extends Controller
 {
+     public function __construct()
+    {
+        $this->middleware('permission:examns.index')->only('index');
+        $this->middleware('permission:examns.create')->only(['create', 'store']);
+        $this->middleware('permission:examns.show')->only('show');
+        $this->middleware('permission:examns.edit')->only(['edit', 'update']);
+        $this->middleware('permission:examns.destroy')->only('destroy');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -58,7 +66,7 @@ class ExamnController extends Controller
             if (request()->header('Content-Type') == 'application/json') {
                 return response()->json($examn, 201);
             } else {
-                return redirect()->route('examns.index');
+                return redirect()->route('examns.edit', $examn->id)->with('info', 'Examen guardado con éxito');
             }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
@@ -117,7 +125,7 @@ class ExamnController extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($examn, 201);
                 } else {
-                    return redirect()->route('examns.index');
+                    return redirect()->route('examns.edit', $examn->id)->with('info', 'Examen ctualizado con éxito');
                 }
             } else {
                 return response()->json(['error' => 'Examen no existente'], 406);
@@ -150,7 +158,7 @@ class ExamnController extends Controller
                     if (request()->header('Content-Type') == 'application/json') {
                         return response()->json(['exitoso' => 'Examen: ' . $examn->name . ' eliminado con éxito'], 204);
                     } else {
-                        return redirect()->route('examns.index');
+                        return redirect()->route('examns.index')->with('info', 'Examen eliminado con éxito');
                     }
                 }
             } else {

@@ -62,7 +62,7 @@ class ProductionController extends Controller
                     if (request()->header('Content-Type') == 'application/json') {
                         return response()->json($productions, 201);
                     } else {
-                        return redirect()->route('productions.show', $animal->id);
+                        return redirect()->route('productions.edit', $productions->id)->with('info', 'Producción guardada con éxito');
                     }
                 } else {
                     return response()->json(['error' => 'El Animal: ' . $animal->animal_rfid . ' ya tiene registrado el Calostro: ' . $productions->colostrum . ' y la Leche: ' . $productions->milk . ' de Fecha: ' . $productions->production_date->format('d/m/Y')], 406);
@@ -172,7 +172,7 @@ class ProductionController extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($productions, 201);
                 } else {
-                    return redirect()->route('productions.show', $productions->animal_id);
+                    return redirect()->route('productions.edit', $productions->id)->with('info', 'Producción actualizada con éxito');
                 }
             } else {
                 return response()->json(['error' => 'Producción no existente'], 406);
@@ -197,7 +197,7 @@ class ProductionController extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json(['exitoso' => 'Producción eliminada con éxito'], 204);
                 } else {
-                    return redirect()->route('productions.show', $production->animal_id);
+                    return redirect()->route('productions.show', $production->animal_id)->with('info', 'Producción eliminada con éxito');
                 }
             } else {
                 return response()->json(['error' => 'Producción no existente'], 406);

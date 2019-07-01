@@ -74,7 +74,7 @@ class HistoricalWeightHeightController extends Controller
                     if (request()->header('Content-Type') == 'application/json') {
                         return response()->json($animalHistoricals, 201);
                     } else {
-                        return redirect()->route('historicals.show', $animal->id);
+                        return redirect()->route('historicals.edit', $animalHistoricals->id)->with('info', 'Histórico guardado con éxito');
                     }
                 } else {
                     return response()->json(['error' => 'El Animal: ' . $animal->animal_rfid . ' ya tiene registrado el Peso: ' . $animalHistoricals->weight . ' y la Altura: ' . $animalHistoricals->weight . ' de Fecha: ' . $animalHistoricals->measurement_date->format('d/m/Y')], 406);
@@ -196,7 +196,7 @@ class HistoricalWeightHeightController extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($animalHistoricals, 201);
                 } else {
-                    return redirect()->route('historicals.show', $animalHistoricals->animal_id);
+                    return redirect()->route('historicals.edit', $animalHistoricals->id)->with('info', 'Histórico actualizado con éxito');
                 }
             } else {
                 return response()->json(['error' => 'Histórico de Peso y Altura no existente'], 406);
@@ -221,7 +221,7 @@ class HistoricalWeightHeightController extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json(['exitoso' => 'Histórico eliminado con éxito'], 204);
                 } else {
-                    return redirect()->route('historicals.show', $animalHistoricals->animal_id);
+                    return redirect()->route('historicals.show', $animalHistoricals->animal_id)->with('info', 'Histórico eliminado con éxito');
                 }
             } else {
                 return response()->json(['error' => 'Histórico de Peso y Altura no existente'], 406);

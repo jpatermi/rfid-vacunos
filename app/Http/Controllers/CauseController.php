@@ -8,6 +8,14 @@ use App\Disease;
 
 class CauseController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:causes.index')->only('index');
+        $this->middleware('permission:causes.create')->only(['create', 'store']);
+        $this->middleware('permission:causes.show')->only('show');
+        $this->middleware('permission:causes.edit')->only(['edit', 'update']);
+        $this->middleware('permission:causes.destroy')->only('destroy');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -56,7 +64,7 @@ class CauseController extends Controller
             if (request()->header('Content-Type') == 'application/json') {
                 return response()->json($cause, 201);
             } else {
-                return redirect()->route('causes.index');
+                return redirect()->route('causes.edit', $cause->id)->with('info', 'Causa guardada con éxito');
             }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
@@ -112,7 +120,7 @@ class CauseController extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($cause, 201);
                 } else {
-                    return redirect()->route('causes.index');
+                    return redirect()->route('causes.edit', $cause->id)->with('info', 'Causa actulizada con éxito');
                 }
             } else {
                 return response()->json(['error' => 'Causa no existente'], 406);
@@ -145,7 +153,7 @@ class CauseController extends Controller
                     if (request()->header('Content-Type') == 'application/json') {
                         return response()->json(['exitoso' => 'Causa: ' . $causeLocated->name . ' eliminada con éxito'], 204);
                     } else {
-                        return redirect()->route('causes.index');
+                        return redirect()->route('causes.index')->with('info', 'Causa eliminada con éxito');
                     }
                 }
             } else {

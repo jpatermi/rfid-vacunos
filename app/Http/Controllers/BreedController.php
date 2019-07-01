@@ -9,6 +9,14 @@ use Barryvdh\DomPDF\Facade as PDF;
 
 class BreedController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:breeds.index')->only('index');
+        $this->middleware('permission:breeds.create')->only(['create', 'store']);
+        $this->middleware('permission:breeds.show')->only('show');
+        $this->middleware('permission:breeds.edit')->only(['edit', 'update']);
+        $this->middleware('permission:breeds.destroy')->only('destroy');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -63,7 +71,7 @@ class BreedController extends Controller
             if (request()->header('Content-Type') == 'application/json') {
                 return response()->json($breed, 201);
             } else {
-                return redirect()->route('breeds.index');
+                return redirect()->route('breeds.edit', $breed->id)->with('info', 'Raza guardada con éxito');
             }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
@@ -135,7 +143,7 @@ class BreedController extends Controller
                 }
                 else
                 {
-                    return redirect()->route('breeds.index');
+                    return redirect()->route('breeds.edit', $breed->id)->with('info', 'Raza actualizada con éxito');
                 }
 
             } else {
@@ -172,7 +180,7 @@ class BreedController extends Controller
                     }
                     else
                     {
-                        return redirect()->route('breeds.index');
+                        return redirect()->route('breeds.index')->with('info', 'Raza eliminada con éxito');
                     }
                 }
             } else {

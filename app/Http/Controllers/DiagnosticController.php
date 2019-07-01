@@ -8,7 +8,15 @@ use App\Disease;
 
 class DiagnosticController extends Controller
 {
-    /**
+     public function __construct()
+    {
+        $this->middleware('permission:diagnostics.index')->only('index');
+        $this->middleware('permission:diagnostics.create')->only(['create', 'store']);
+        $this->middleware('permission:diagnostics.show')->only('show');
+        $this->middleware('permission:diagnostics.edit')->only(['edit', 'update']);
+        $this->middleware('permission:diagnostics.destroy')->only('destroy');
+    }
+   /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
@@ -56,7 +64,7 @@ class DiagnosticController extends Controller
             if (request()->header('Content-Type') == 'application/json') {
                 return response()->json($diagnostic, 201);
             } else {
-                return redirect()->route('diagnostics.index');
+                return redirect()->route('diagnostics.edit', $diagnostic->id)->with('info', 'Diagnóstico guardado con éxito');
             }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
@@ -113,7 +121,7 @@ class DiagnosticController extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($diagnostic, 201);
                 } else {
-                    return redirect()->route('diagnostics.index');
+                    return redirect()->route('diagnostics.edit', $diagnostic->id)->with('info', 'Diagnóstico actualizado con éxito');
                 }
             } else {
                 return response()->json(['error' => 'diagnóstico no existente'], 406);
@@ -147,7 +155,7 @@ class DiagnosticController extends Controller
                     if (request()->header('Content-Type') == 'application/json') {
                         return response()->json(['exitoso' => 'Diagnóstico: ' . $diagnosticLocated->name . ' eliminado con éxito'], 204);
                     } else {
-                        return redirect()->route('diagnostics.index');
+                        return redirect()->route('diagnostics.index')->with('info', 'Diagnóstico eliminado con éxito');
                     }
                 }
             } else {

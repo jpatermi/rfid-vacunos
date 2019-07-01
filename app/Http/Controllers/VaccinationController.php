@@ -8,6 +8,14 @@ use Barryvdh\DomPDF\Facade as PDF;
 
 class VaccinationController extends Controller
 {
+     public function __construct()
+    {
+        $this->middleware('permission:vaccinations.index')->only('index');
+        $this->middleware('permission:vaccinations.create')->only(['create', 'store']);
+        $this->middleware('permission:vaccinations.show')->only('show');
+        $this->middleware('permission:vaccinations.edit')->only(['edit', 'update']);
+        $this->middleware('permission:vaccinations.destroy')->only('destroy');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -58,7 +66,7 @@ class VaccinationController extends Controller
             if (request()->header('Content-Type') == 'application/json') {
                 return response()->json($vaccination, 201);
             } else {
-                return redirect()->route('vaccinations.index');
+                return redirect()->route('vaccinations.edit', $vaccination->id)->with('info', 'Vacuna guardada con éxito');
             }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
@@ -117,7 +125,7 @@ class VaccinationController extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($vaccination, 201);
                 } else {
-                    return redirect()->route('vaccinations.index');
+                    return redirect()->route('vaccinations.edit', $vaccination->id)->with('info', 'Vacuna actualizada con éxito');
                 }
             } else {
                 return response()->json(['error' => 'Vacuna no existente'], 406);
@@ -150,7 +158,7 @@ class VaccinationController extends Controller
                     if (request()->header('Content-Type') == 'application/json') {
                         return response()->json(['exitoso' => 'Vacuna: ' . $vaccination->name . ' eliminada con éxito'], 204);
                     } else {
-                        return redirect()->route('vaccinations.index');
+                        return redirect()->route('vaccinations.index')->with('info', 'Vacuna eliminada con éxito');
                     }
                 }
             } else {

@@ -57,7 +57,7 @@ class AgeGroupController extends Controller
             if (request()->header('Content-Type') == 'application/json') {
                 return response()->json($ageGroup, 201);
             } else {
-                return redirect()->route('agegroups.index');
+                return redirect()->route('agegroups.edit', $ageGroup->id)->with('info', 'Grupo Etario guardado con éxito');
             }
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
@@ -114,7 +114,7 @@ class AgeGroupController extends Controller
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($ageGroup, 201);
                 } else {
-                    return redirect()->route('agegroups.index');
+                    return redirect()->route('agegroups.edit', $ageGroup->id)->with('info', 'Grupo Etario actualizado con éxito');
                 }
             } else {
                 return response()->json(['error' => 'Grupo Etario no existente'], 406);
@@ -147,7 +147,7 @@ class AgeGroupController extends Controller
                     if (request()->header('Content-Type') == 'application/json') {
                         return response()->json(['exitoso' => 'Grupo Etario: ' . $ageGroupLocated->name . ' eliminado con éxito'], 204);
                     } else {
-                        return redirect()->route('agegroups.index');
+                        return redirect()->route('agegroups.index')->with('info', 'Grupo Etario eliminado con éxito');
                     }
                 }
             } else {
