@@ -25,6 +25,10 @@
                 background-repeat: no-repeat;
                 background-position: center;
                 background-size: auto;
+                -webkit-background-size: cover;
+                -moz-background-size: cover;
+                -o-background-size: cover;
+                /*background-size: cover;*/
             }
 
             .full-height {
@@ -58,7 +62,7 @@
             .links > a {
                 color: #fff;
                 padding: 0 25px;
-                font-size: 15px;
+                font-size: 20px;
                 font-weight: 600;
                 letter-spacing: .1rem;
                 text-decoration: none;
@@ -98,8 +102,8 @@
                     <a href="https://nova.laravel.com">Nova</a>
                     <a href="https://forge.laravel.com">Forge</a>
                     <a href="https://github.com/laravel/laravel">GitHub</a>-->
-                </div>
-            </div>
+                <!--</div>
+            </div>-->
         </div>
     </body>
 </html>

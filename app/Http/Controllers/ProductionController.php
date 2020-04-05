@@ -50,6 +50,7 @@ class ProductionController extends Controller
                 $productions = $animal->productions()->where('animal_id', $data['animal_id'])
                                        ->where('colostrum', $data['colostrum'])
                                        ->where('milk', $data['milk'])
+                                       ->where('production_date', $data['production_date'])
                                        ->get()
                                        ->first();
                 if(!$productions) {

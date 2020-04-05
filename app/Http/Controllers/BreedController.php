@@ -202,7 +202,7 @@ class BreedController extends Controller
         $totalBreeds = array();
         foreach ($breeds as $breed) {
             $name   = $breed->name;
-            for ($x = 1; $x <= (26 - strlen($breed->name)); $x++)
+            for ($x = 1; $x <= (22 - strlen($breed->name)); $x++)
             {
                 $name = $name . "\t";
             }

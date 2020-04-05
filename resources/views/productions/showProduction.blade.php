@@ -19,8 +19,8 @@
               <thead class="thead-dark">
                 <tr>
                   <th scope="col">Fecha</th>
-                  <th scope="col">Calostro (Lts)</th>
-                  <th scope="col">Leche (Lts)</th>
+                  <th scope="col">Calostro (ml)</th>
+                  <th scope="col">Leche (ml)</th>
                   <th scope="col">Acciones</th>
                 </tr>
               </thead>

@@ -56,6 +56,16 @@
                             <a class="nav-item nav-link active" href="{{ route('animals.index') }}">Registro de Animales</a>
                             <li class="nav-item dropdown active">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                  Aplicación Masiva
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <a class="dropdown-item" href="{{ route('animalvaccination.bulkLoad') }}">Vacunaciones</a>
+                                    <a class="dropdown-item" href="{{ route('animaldewormer.bulkLoad') }}">Desparasitaciones</a>
+                                    <a class="dropdown-item" href="{{ route('animalvitamin.bulkLoad') }}">Vitaminas</a>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown active">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                   Reportes
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">

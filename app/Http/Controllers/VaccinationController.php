@@ -56,12 +56,16 @@ class VaccinationController extends Controller
     {
         try {
             $data = $request->validate([
-              'name' => 'required',
-              'characteristic' => 'required',
+              'name'            => 'required',
+              'characteristic'  => 'required',
+              'expiration_date' => 'required|date',
+              'lot'             => 'required',
             ]);
             $vaccination = Vaccination::create([
-              'name' => $data['name'],
-              'characteristic' => $data['characteristic'],
+              'name'            => $data['name'],
+              'characteristic'  => $data['characteristic'],
+              'expiration_date' => $data['expiration_date'],
+              'lot'             => $data['lot'],
             ]);
             if (request()->header('Content-Type') == 'application/json') {
                 return response()->json($vaccination, 201);
@@ -114,13 +118,17 @@ class VaccinationController extends Controller
     {
         try {
             $data = $request->validate([
-              'name' => 'required',
-              'characteristic' => 'required',
+              'name'            => 'required',
+              'characteristic'  => 'required',
+              'expiration_date' => 'required|date',
+              'lot'             => 'required',
             ]);
             $vaccination = Vaccination::find($vaccination);
             if($vaccination) {
-                $vaccination->name = $data['name'];
-                $vaccination->characteristic = $data['characteristic'];
+                $vaccination->name              = $data['name'];
+                $vaccination->characteristic    = $data['characteristic'];
+                $vaccination->expiration_date   = $data['expiration_date'];
+                $vaccination->lot               = $data['lot'];
                 $vaccination->save();
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($vaccination, 201);

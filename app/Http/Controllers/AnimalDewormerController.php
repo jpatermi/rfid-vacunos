@@ -6,6 +6,7 @@ use App\AnimalDewormer;
 use Illuminate\Http\Request;
 use App\Animal;
 use App\Dewormer;
+use App\AgeGroup;
 
 class AnimalDewormerController extends Controller
 {
@@ -44,33 +45,63 @@ class AnimalDewormerController extends Controller
                 'dose'             => 'required|numeric',
                 'application_date' => 'required|date',
             ]);
-            $animal = Animal::find($data['animal_id']);
-            if($animal) {
-                $anidesp = $animal->dewormers()
-                                  ->where('animal_id', $data['animal_id'])
-                                  ->where('dewormer_id', $data['dewormer_id'])
-                                  ->where('application_date', $data['application_date'])
-                                  ->get()
-                                  ->first();
-                if(!$anidesp) {
-                    $anidesp = AnimalDewormer::create([
-                      'animal_id' => $data['animal_id'],
-                      'dewormer_id' => $data['dewormer_id'],
-                      'dose' => $data['dose'],
-                      'application_date' => $data['application_date'],
-                    ]);
-                    if (request()->header('Content-Type') == 'application/json') {
-                        return response()->json($anidesp, 201);
+            if (request()->header('Content-Type') == 'application/json') {
+                $animal = Animal::find($data['animal_id']);
+                if($animal) {
+                    $anidesp = $animal->dewormers()
+                                      ->where('animal_id', $data['animal_id'])
+                                      ->where('dewormer_id', $data['dewormer_id'])
+                                      ->where('application_date', $data['application_date'])
+                                      ->get()
+                                      ->first();
+                    if(!$anidesp) {
+                        $anidesp = AnimalDewormer::create([
+                          'animal_id'         => $data['animal_id'],
+                          'dewormer_id'       => $data['dewormer_id'],
+                          'dose'              => $data['dose'],
+                          'application_date'  => $data['application_date'],
+                        ]);
+                        if (request()->header('Content-Type') == 'application/json') {
+                            return response()->json($anidesp, 201);
+                        } else {
+                            return redirect()->route('animaldewormer.show', $anidesp->animal_id)->with('info', 'Aplicación guardada con éxito');
+                        }
                     } else {
-                        return redirect()->route('animaldewormer.show', $anidesp->animal_id)->with('info', 'Aplicación guardada con éxito');
+                        return response()->json(['error' => 'El Animal: ' . $animal->animal_rfid . ' ya tiene el Desparasitante: ' . $anidesp->name . ' de fecha: ' . $anidesp->pivot->application_date->format('d/m/Y')], 406);
                     }
                 } else {
-                    return response()->json(['error' => 'El Animal: ' . $animal->animal_rfid . ' ya tiene el Desparasitante: ' . $anidesp->name . ' de fecha: ' . $anidesp->pivot->application_date->format('d/m/Y')], 406);
+                    return response()->json(['error' => 'Animal no existente'], 406);
                 }
             } else {
-                return response()->json(['error' => 'Animal no existente'], 406);
+                foreach ($data['animal_id'] as $id) {
+                    $animal = Animal::find($id);
+                    if(!$animal) {
+                        return response()->json(['error' => 'Animal no existente'], 406);
+                    }
+                    $anidesp = $animal->dewormers()
+                                      ->where('animal_id', $id)
+                                      ->where('dewormer_id', $data['dewormer_id'])
+                                      ->where('application_date', $data['application_date'])
+                                      ->get()
+                                      ->first();
+                    if($anidesp) {
+                        return response()->json(['error' => 'El Animal: ' . $animal->animal_rfid . ' ya tiene el Desparasitante: ' . $anidesp->name . ' de fecha: ' . $anidesp->pivot->application_date->format('d/m/Y')], 406);
+                    }
+                }
+                foreach ($data['animal_id'] as $id) {
+                    $anidesp = AnimalDewormer::create([
+                      'animal_id'         => $id,
+                      'dewormer_id'       => $data['dewormer_id'],
+                      'dose'              => $data['dose'],
+                      'application_date'  => $data['application_date'],
+                    ]);
+                }
+                if (count($data['animal_id']) > 1) {
+                    return redirect()->route('animals.index')->with('info', 'Aplicación Masiva guardada con éxito');
+                } else {
+                    return redirect()->route('animaldewormer.show', $anidesp->animal_id)->with('info', 'Aplicación guardada con éxito');
+                }
             }
-
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => $e->message()], 500);
         }
@@ -99,6 +130,7 @@ class AnimalDewormerController extends Controller
                     $application = array('id_vac_desp_vit'     => $dewormer->id,
                                          'name_vac_desp_vit'   => $dewormer->name,
                                          'dose'                => $dewormer->pivot->dose,
+                                         'lot'                 => $dewormer->lot,
                                          'application_date'    => $dewormer->pivot->application_date->format('d/m/Y'),
                                          'id_ani_vac_desp_vit' => $dewormer->pivot->id);
                     $applications[] = $application;
@@ -206,5 +238,21 @@ class AnimalDewormerController extends Controller
         } catch (ModelNotFoundException $e){ // TODO: Averiguar el modelo para database
             return response()->json(['error' => 'Sin contenido'], 406);
         }
+    }
+    /**
+     * massive load of dewormers
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function bulkLoad(Request $request)
+    {
+        $ageGroups          = AgeGroup::orderBy('name')->get();
+        $vaccinations       = Dewormer::orderBy('name')->get();
+        $model              = 'animaldewormer';
+        $title              = 'Desparasitantes aplicados';
+        $label              = 'Desparasitante';
+        $nomCampoVacDewVit  = 'dewormer_id';
+        return view('bulkLoad.showVacDewVit', compact('ageGroups', 'vaccinations', 'model', 'title', 'label', 'nomCampoVacDewVit'));
     }
 }

@@ -273,7 +273,27 @@ class AnimalController extends Controller
                     if($request->hasFile('photo'))
                     {
                         $file = $request->file('photo');
-                        $file->storeAs('public/photo/', $animalLocated->animal_rfid . '.jpg');
+                        $file->storeAs('public/photo/', $animalLocated->animal_rfid . '-1.jpg');
+                        // Se actualiza en la BD el indicador
+                        $animalLocated->photo = true;
+                        $animalLocated->save();
+                        Cache::flush();
+                        Cache::pull('photo');
+                    }
+                    if($request->hasFile('photo2'))
+                    {
+                        $file = $request->file('photo2');
+                        $file->storeAs('public/photo/', $animalLocated->animal_rfid . '-2.jpg');
+                        // Se actualiza en la BD el indicador
+                        $animalLocated->photo = true;
+                        $animalLocated->save();
+                        Cache::flush();
+                        Cache::pull('photo');
+                    }
+                    if($request->hasFile('photo3'))
+                    {
+                        $file = $request->file('photo3');
+                        $file->storeAs('public/photo/', $animalLocated->animal_rfid . '-3.jpg');
                         // Se actualiza en la BD el indicador
                         $animalLocated->photo = true;
                         $animalLocated->save();
@@ -378,7 +398,7 @@ class AnimalController extends Controller
             else
             {
                 $file = file_get_contents('php://input');
-                if(file_put_contents(storage_path() . '/app/public/photo/' . $animal_rfid . '.jpg', $file))
+                if(file_put_contents(storage_path() . '/app/public/photo/' . $animal_rfid . '-1.jpg', $file))
                 {
                     $animal = Animal::where('animal_rfid', $animal_rfid)->get()->first();
                     if ($animal)
@@ -409,7 +429,7 @@ class AnimalController extends Controller
      */
     public function showPhoto($animal_rfid)
     {
-         if (!file_exists(public_path() . '/storage/photo/' . $animal_rfid . '.jpg')) {
+         if (!file_exists(public_path() . '/storage/photo/' . $animal_rfid . '-1.jpg')) {
              $animal_rfid = 'no_existe';
          }
 //        $animal = Animal::where('animal_rfid', $animal_rfid)->get()->first();
@@ -449,7 +469,7 @@ class AnimalController extends Controller
             {
                 $name   = $area->name;
                 $areaId = $area->id;
-                for ($x = 1; $x <= (25 - strlen($area->name)); $x++)
+                for ($x = 1; $x <= (22 - strlen($area->name)); $x++)
                 {
                     $name = $name . "\t";
                 }
@@ -460,7 +480,7 @@ class AnimalController extends Controller
                 {
                     $name = $lct1->name;
                     $lct1Id = $lct1->id;
-                    for ($x = 1; $x <= (25 - strlen($lct1->name)); $x++)
+                    for ($x = 1; $x <= (22 - strlen($lct1->name)); $x++)
                     {
                         $name = $name . "\t";
                     }
@@ -470,7 +490,7 @@ class AnimalController extends Controller
                     foreach ($lct2s as $lct2)
                     {
                         $name = $lct2->name;
-                        for ($x = 1; $x <= (25 - strlen($lct2->name)); $x++)
+                        for ($x = 1; $x <= (22 - strlen($lct2->name)); $x++)
                         {
                             $name = $name . "\t";
                         }

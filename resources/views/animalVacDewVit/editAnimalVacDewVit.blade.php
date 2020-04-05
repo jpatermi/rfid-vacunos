@@ -23,7 +23,7 @@
               <label class="font-weight-bold" for="vaccinationEdit">{{ $label }}:</label>
               <select class="form-control" id="vaccinationEdit">
                 @foreach($vaccinations as $vaccination)
-                    <option value="{{ $vaccination->id }}">{{ $vaccination->name }}</option>
+                    <option value="{{ $vaccination->id }}">{{ $vaccination->name . ' -> Lote: ' . $vaccination->lot }}</option>
                   @endforeach
               </select>
             @if($errors->has('vaccination_id'))
@@ -56,7 +56,7 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
       </div>
     </div>
   </div>

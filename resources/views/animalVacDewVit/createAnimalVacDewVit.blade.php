@@ -22,7 +22,7 @@
               <label class="font-weight-bold" for="vacdewvit_idCreate">{{ $label }} :</label>
               <select class="form-control" id="vacdewvit_idCreate">
                 @foreach($vaccinations as $vaccination)
-                    <option value="{{ $vaccination->id }}">{{ $vaccination->name }}</option>
+                    <option value="{{ $vaccination->id }}">{{ $vaccination->name . ' -> Lote: ' . $vaccination->lot }}</option>
                   @endforeach
               </select>
             @if($errors->has('vaccination_id'))
@@ -50,14 +50,14 @@
           </div>
 
           <!-- Textos ocultos que  vendrán en la sesión para el user_id y el farm_id -->
-          <input type="text" name="animal_id" id="animal_id" hidden value="{{ old('animal_id', $animal->id) }}">
+          <input type="text" name="animal_id[]" id="animal_id" hidden value="{{ old('animal_id', $animal->id) }}">
           <input type="text" name="application_date" id="application_date" hidden value="{{ old('application_date') }}">
           <!-- -->
           <button type="submit" class="btn btn-primary">Agregar {{ $label }}</button>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
       </div>
     </div>
   </div>

@@ -19,6 +19,10 @@
                 <tr>
                   <th scope="col">Nombre</th>
                   <th scope="col">Característica</th>
+                  @if($labelVacDewVit != 'Examen')
+                    <th scope="col">Fecha Vencimiento</th>
+                    <th scope="col">Lote</th>
+                  @endif
                   <th scope="col">Acciones</th>
                 </tr>
               </thead>
@@ -27,6 +31,10 @@
               <tr>
                   <td>{{ $varVacDewVit->name }}</td>
                   <td>{{ $varVacDewVit->characteristic }}</td>
+                  @if($labelVacDewVit != 'Examen')
+                    <td>{{ $varVacDewVit->expiration_date->format('d/m/Y') }}</td>
+                    <td>{{ $varVacDewVit->lot }}</td>
+                  @endif
                   <td>
                       <form action="{{ route($model . '.destroy', $varVacDewVit) }}" method="POST">
                           {{ method_field('DELETE') }}

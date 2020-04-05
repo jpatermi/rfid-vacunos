@@ -23,6 +23,9 @@
                     <th scope="col">Dosis</th>
                   @endif
                   <th scope="col">Aplicación</th>
+                  @if($label != 'Examen')
+                    <th scope="col">Lote</th>
+                  @endif
                   <th scope="col">Acciones</th>
                 </tr>
               </thead>
@@ -34,6 +37,9 @@
                     <td>{{ $application['dose'] }}</td>
                   @endif
                   <td id="fecha">{{ $application['application_date'] }}</td>
+                  @if($label != 'Examen')
+                    <td>{{ $application['lot'] }}</td>
+                  @endif
                   <td>
                       <form action="{{ route($model . '.destroy', $application['id_ani_vac_desp_vit']) }}" method="POST">
                           {{ method_field('DELETE') }}

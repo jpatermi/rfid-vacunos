@@ -3,4 +3,16 @@ ANIMALS:
 
 USERS:
   Se agregó el campo farm_id que hace referencia a la FARM
-  Se agregó el campo deleted_at y se hizo unique con username y con email... api_token queda como estaba 
+  Se agregó el campo deleted_at y se hizo unique con username y con email... api_token queda como estaba
+
+VACCINATIONS:
+  Se agregó el campo expiration_date de tipo DATE
+  Se agregó el campo lot de tipo VARCHAR 50
+
+DEWORMERS:
+  Se agregó el campo expiration_date de tipo DATE
+  Se agregó el campo lot de tipo VARCHAR 50
+
+VITAMINS:
+  Se agregó el campo expiration_date de tipo DATE
+  Se agregó el campo lot de tipo VARCHAR 50

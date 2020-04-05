@@ -93,6 +93,12 @@ Route::group(['middleware' => ['auth.web']], function() use($router) {
 	//### Históricos de Pesos y Alturas ###
 	Route::resource('historicals', 'HistoricalWeightHeightController');
 
+	//### Carga masiva de aplicación de Vacunas, Desparasitantes y Vitaminas ###
+	Route::get('/bulkLoadVaccination', ['uses'=>'AnimalVaccinationController@bulkLoad'])->name('animalvaccination.bulkLoad');
+	Route::get('/bulkLoadDewormer', ['uses'=>'AnimalDewormerController@bulkLoad'])->name('animaldewormer.bulkLoad');
+	Route::get('/bulkLoadVitamin', ['uses'=>'AnimalVitaminController@bulkLoad'])->name('animalvitamin.bulkLoad');
+	Route::get('/AgeGroupAnimals/{ageGroup}', ['uses'=>'AgeGroupController@getAgeGroupAnimals'])->name('agegroups.AgeGroupAnimals');
+
 	//### Rutas para los PDF ###
 	Route::get('/agegrouppdf', ['uses'=>'AgeGroupController@exportPdf'])->name('agegroups.AgeGroupPDF');
 	Route::get('/vaccinationpdf', ['uses'=>'VaccinationController@exportPdf'])->name('vaccinations.VaccinationPDF');

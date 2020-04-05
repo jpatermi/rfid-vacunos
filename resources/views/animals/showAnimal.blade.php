@@ -50,7 +50,7 @@
 				</div>
 			@endif
 
-			@if( $animal->photo )
+			{{--@if( $animal->photo )
 				<div class="text-center mb-4">
 					<img src="{{ asset('/storage/photo/' . $animal->animal_rfid . '.jpg') }}" alt="Foto Animal" class="img-thumbnail" width="300px" height="300px">
 				</div>
@@ -60,7 +60,94 @@
 						<h3>Sin Foto</h3>
 					</div>
 				</div>
-			@endif
+			@endif--}}
+			{{--@if( $animal->photo )--}}
+			<div class="nav justify-content-center">
+				<div style="width: 400px; height: 400px; ">
+					<div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+					  <ol class="carousel-indicators">
+					    <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+					    <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+					    <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+					  </ol>
+					  <div class="carousel-inner">
+					    <div class="carousel-item active">
+					    	@if (file_exists(storage_path() . '/app/public/photo/' . $animal->animal_rfid . '-1.jpg'))
+						      <img class="d-block w-100" src="{{ asset('/storage/photo/' . $animal->animal_rfid . '-1.jpg') }}" alt="Sin 1° Foto" style="width: 400px; height: 400px;">
+					      @else
+									<div class="text-center p-5 bg-light text-dark" style="width: 400px; height: 400px;">
+										<h3 style="line-height: 250px;">Sin 1° Foto</h3>
+									</div>
+					      @endif
+					    </div>
+					    <div class="carousel-item">
+					    	@if (file_exists(storage_path() . '/app/public/photo/' . $animal->animal_rfid . '-2.jpg'))
+						      <img class="d-block w-100" src="{{ asset('/storage/photo/' . $animal->animal_rfid . '-2.jpg') }}" alt="Sin 2° Foto" style="width: 400px; height: 400px">
+					      @else
+									<div class="text-center p-5 bg-light text-dark" style="width: 400px; height: 400px;">
+										<h3 style="line-height: 250px;">Sin 2° Foto</h3>
+									</div>
+					      @endif
+					    </div>
+					    <div class="carousel-item">
+					    	@if (file_exists(storage_path() . '/app/public/photo/' . $animal->animal_rfid . '-3.jpg'))
+						      <img class="d-block w-100" src="{{ asset('/storage/photo/' . $animal->animal_rfid . '-3.jpg') }}" alt="Sin 3° Foto" style="width: 400px; height: 400px">
+					      @else
+									<div class="text-center p-5 bg-light text-dark" style="width: 400px; height: 400px;">
+										<h3 style="line-height: 250px;">Sin 3° Foto</h3>
+									</div>
+					      @endif
+						    </div>
+					  </div>
+					  <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+					    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+					    <span class="sr-only">Previous</span>
+					  </a>
+					  <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+					    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+					    <span class="sr-only">Next</span>
+					  </a>
+					</div>
+				</div>
+			</div>
+			{{--@else
+			<div class="nav justify-content-center">
+				<div style="max-width: 400px; max-height: 400px; ">
+					<div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+					  <ol class="carousel-indicators">
+					    <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+					    <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+					    <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+					  </ol>
+					  <div class="carousel-inner">
+					    <div class="carousel-item active">
+							<div class="text-center p-5 bg-light text-dark" style="width: 300px; height: 300px">
+								<h3>Sin 1° Foto</h3>
+							</div>
+					    </div>
+					    <div class="carousel-item">
+							<div class="text-center p-5 bg-light text-dark" style="width: 300px; height: 300px">
+								<h3>Sin 2° Foto</h3>
+							</div>
+					    </div>
+					    <div class="carousel-item">
+							<div class="text-center p-5 bg-light text-dark" style="width: 300px; height: 300px">
+								<h3>Sin 3° Foto</h3>
+							</div>
+					    </div>
+					  </div>
+					  <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+					    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+					    <span class="sr-only">Previous</span>
+					  </a>
+					  <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+					    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+					    <span class="sr-only">Next</span>
+					  </a>
+					</div>
+				</div>
+			</div>
+			@endif--}}
 
 			<hr class="mt-4">
 
@@ -73,7 +160,7 @@
 				<div class="form-group col-md-4">
                     <label class="font-weight-bold" for="dateface">Fecha de nacimiento:</label>
                     <div class="input-group date">
-                        <input type="text" class="form-control" name="dateface" id="dateface" value="{{ $animal->birthdate->format('d/m/Y') }}" readonly>
+                        <input type="text" class="form-control" name="dateface" id="dateface" value="{{ $animal->birthdate }}" readonly>
                           <img class="input-group-addon" src="{{ asset('img/ico/baseline-calendar_today-24px.svg') }}" alt="Calendario">
                     </div>
                 </div>
@@ -141,7 +228,7 @@
 @include('physicalCharacteristics.showPhysicalCharacteristics')
 @include('animalLocations.showAnimalLocations')
 @endsection
-{{--@section('scripts')
+@section('scripts')
     <script>
 		$.when( $.ready ).then(function() {
           $( "#dateface" ).attr( "value", convertDateFormatUSA_to_VZLA(`${dateface.value}`));
@@ -152,4 +239,4 @@
           return info[2] + '/' + info[1] + '/' + info[0];
         };
     </script>
-@endsection--}}
+@endsection

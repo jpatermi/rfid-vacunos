@@ -158,7 +158,7 @@ class AgeGroupController extends Controller
         }
     }
     /**
-     * Display a Total of the resource by Breeds.
+     * Display a Total of the resource by Age Group.
      *
      * @return \Illuminate\Http\Response
      */
@@ -192,5 +192,15 @@ class AgeGroupController extends Controller
         $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif']);
         $pdf ->loadView('report.pdf.AgeGroupsPDF', compact('ageGroups'));
         return $pdf->download('grupo-etario.pdf');
+    }
+    /**
+     * Get the animals of the resource Age Group.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getAgeGroupAnimals(AgeGroup $ageGroup)
+    {
+        $animals = $ageGroup->animals->sortBy('animal_rfid')->values();
+        return response()->json($animals, 200);
     }
 }

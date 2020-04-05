@@ -56,12 +56,16 @@ class VitaminController extends Controller
     {
         try {
             $data = $request->validate([
-              'name' => 'required',
-              'characteristic' => 'required',
+              'name'            => 'required',
+              'characteristic'  => 'required',
+              'expiration_date' => 'required|date',
+              'lot'             => 'required',
             ]);
             $vitamin = Vitamin::create([
-              'name' => $data['name'],
-              'characteristic' => $data['characteristic'],
+              'name'            => $data['name'],
+              'characteristic'  => $data['characteristic'],
+              'expiration_date' => $data['expiration_date'],
+              'lot'             => $data['lot'],
             ]);
             if (request()->header('Content-Type') == 'application/json') {
                 return response()->json($vitamin, 201);
@@ -114,13 +118,17 @@ class VitaminController extends Controller
     {
         try {
             $data = $request->validate([
-              'name' => 'required',
-              'characteristic' => 'required',
+              'name'            => 'required',
+              'characteristic'  => 'required',
+              'expiration_date' => 'required|date',
+              'lot'             => 'required',
             ]);
             $vitamin = Vitamin::find($vitamin);
             if($vitamin) {
-                $vitamin->name = $data['name'];
-                $vitamin->characteristic = $data['characteristic'];
+                $vitamin->name              = $data['name'];
+                $vitamin->characteristic    = $data['characteristic'];
+                $vitamin->expiration_date   = $data['expiration_date'];
+                $vitamin->lot               = $data['lot'];
                 $vitamin->save();
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($vitamin, 201);

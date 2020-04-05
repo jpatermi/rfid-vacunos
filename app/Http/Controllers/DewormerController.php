@@ -56,12 +56,16 @@ class DewormerController extends Controller
     {
         try {
             $data = $request->validate([
-              'name' => 'required',
-              'characteristic' => 'required',
+              'name'            => 'required',
+              'characteristic'  => 'required',
+              'expiration_date' => 'required|date',
+              'lot'             => 'required',
             ]);
             $dewormer = Dewormer::create([
-              'name' => $data['name'],
-              'characteristic' => $data['characteristic'],
+              'name'            => $data['name'],
+              'characteristic'  => $data['characteristic'],
+              'expiration_date' => $data['expiration_date'],
+              'lot'             => $data['lot'],
             ]);
             if (request()->header('Content-Type') == 'application/json') {
                 return response()->json($dewormer, 201);
@@ -114,13 +118,17 @@ class DewormerController extends Controller
     {
         try {
             $data = $request->validate([
-              'name' => 'required',
-              'characteristic' => 'required',
+              'name'            => 'required',
+              'characteristic'  => 'required',
+              'expiration_date' => 'required|date',
+              'lot'             => 'required',
             ]);
             $dewormer = Dewormer::find($dewormer);
             if($dewormer) {
-                $dewormer->name = $data['name'];
-                $dewormer->characteristic = $data['characteristic'];
+                $dewormer->name             = $data['name'];
+                $dewormer->characteristic   = $data['characteristic'];
+                $dewormer->expiration_date  = $data['expiration_date'];
+                $dewormer->lot              = $data['lot'];
                 $dewormer->save();
                 if (request()->header('Content-Type') == 'application/json') {
                     return response()->json($dewormer, 201);

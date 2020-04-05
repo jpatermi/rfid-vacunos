@@ -1,7 +1,10 @@
 @extends('layouts.app')
 @section('content')
 	<div class="card">
-		<h4 class="card-header font-weight-bold text-center">Actualizar Animal</h4>
+		<h4 class="card-header font-weight-bold text-center">Actualizar Animal
+				<a href="{{ route('animals.index') }}" class="btn btn-link d-flex justify-content-end">Regresar al listado de Animales</a>
+		</h4>
+
 		<div class="card-body">
 			@if($errors->any())
 				<div class="alert alert-danger text-center">
@@ -21,22 +24,56 @@
 						@endif
 				    </div>
 				</div>
-				@if( $animal->photo )
-					<div class="text-center mb-4">
-						<img src="{{ asset('/storage/photo/' . $animal->animal_rfid . '.jpg') }}" alt="Foto Animal" class="img-thumbnail" width="300px" height="300px">
-					</div>
-				@else
-					<div class="form-row nav justify-content-center mb-2">
-						<div class="col-md-4 text-center p-3 bg-light text-dark">
-							<h3>Sin Foto</h3>
+				<!-- FOTOS -->
+				<div class="form-row nav justify-content-center">
+					<div class="text-center mb-2">
+						@if (file_exists(storage_path() . '/app/public/photo/' . $animal->animal_rfid . '-1.jpg'))
+							<img src="{{ asset('/storage/photo/' . $animal->animal_rfid . '-1.jpg') }}" alt="1° Foto Animal" class="img-thumbnail" style="width: 300px; height: 300px">
+						@else
+							<div class="text-center p-5 bg-light text-dark ml-3" style="width: 300px; height: 300px;">
+								<h3 style="line-height: 150px;">Sin 1° Foto</h3>
+							</div>
+						@endif
+						<div class="row nav justify-content-center mt-2">
+							<div class="custom-file col-md-10">
+								<input type="file" class="custom-file-input" id="photo" name="photo" accept="image/jpeg">
+								<label class="custom-file-label text-left" for="photo">Seleccionar 1° Foto</label>
+							</div>
 						</div>
 					</div>
-				@endif
-				<div class="form-row nav justify-content-center mb-2">
-					<div class="custom-file col-md-8">
-						<input type="file" class="custom-file-input" id="photo" name="photo" accept="image/jpeg">
-						<label class="custom-file-label" for="photo">Seleccionar Foto</label>
+					<div class="text-center mb-2">
+						@if (file_exists(storage_path() . '/app/public/photo/' . $animal->animal_rfid . '-2.jpg'))
+							<img src="{{ asset('/storage/photo/' . $animal->animal_rfid . '-2.jpg') }}" alt="2° Foto Animal" class="img-thumbnail" style="width: 300px; height: 300px">
+						@else
+							<div class="text-center p-5 bg-light text-dark ml-3" style="width: 300px; height: 300px;">
+								<h3 style="line-height: 150px;">Sin 2° Foto</h3>
+							</div>
+						@endif
+						<div class="row nav justify-content-center mt-2">
+							<div class="custom-file col-md-10">
+								<input type="file" class="custom-file-input" id="photo2" name="photo2" accept="image/jpeg">
+								<label class="custom-file-label text-left" for="photo2">Seleccionar 2° Foto</label>
+							</div>
+						</div>
 					</div>
+					<div class="text-center">
+						@if (file_exists(storage_path() . '/app/public/photo/' . $animal->animal_rfid . '-3.jpg'))
+							<img src="{{ asset('/storage/photo/' . $animal->animal_rfid . '-3.jpg') }}" alt="3° Foto Animal" class="img-thumbnail" style="width: 300px; height: 300px">
+						@else
+							<div class="text-center p-5 bg-light text-dark ml-3" style="width: 300px; height: 300px;">
+								<h3 style="line-height: 150px;">Sin 3° Foto</h3>
+							</div>
+						@endif
+						<div class="row nav justify-content-center mt-2">
+							<div class="custom-file col-md-10">
+								<input type="file" class="custom-file-input" id="photo3" name="photo3" accept="image/jpeg">
+								<label class="custom-file-label text-left" for="photo3">Seleccionar 3° Foto</label>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Fin FOTOS -->
+				<div class="form-row nav justify-content-center mb-2">
 				</div>
 				<hr class="mt-4">
 				<div class="form-row nav justify-content-center">
@@ -180,9 +217,9 @@
 @endsection
 @section('scripts')
     <script>
-		$.when( $.ready ).then(function() {
+        $.when( $.ready ).then(function() {
           $( "#dateface" ).attr( "value", convertDateFormatUSA_to_VZLA(`${dateface.value}`));
-		});
+        });
 
 		$("#area").change(event => {
 			$("#lct1").empty();

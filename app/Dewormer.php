@@ -16,6 +16,8 @@ class Dewormer extends Model
     protected $fillable = [
         'name',
         'characteristic',
+        'expiration_date',
+        'lot',
     ];
 
     /**
@@ -34,7 +36,7 @@ class Dewormer extends Model
      *
      * @var array
      */
-    protected $dates = ['deleted_at'];
+    protected $dates = ['deleted_at', 'expiration_date'];
     /**
      * Get the comments for the animals.
     */
